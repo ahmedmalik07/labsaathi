@@ -42,3 +42,6 @@ next-env.d.ts
 
 # generated at build time from lab_reports/ (npm run kb)
 /src/generated/
+
+# local tooling
+/.claude/
