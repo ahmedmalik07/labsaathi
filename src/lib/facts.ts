@@ -72,5 +72,7 @@ export function allowedNumbers(facts: EngineFacts): number[] {
     const n = Number(m[0].replace(/,/g, ""));
     if (Number.isFinite(n)) found.add(n);
   }
+  // Counting the tests on the report ("2 of your 3 results") is not inventing a value.
+  for (let i = 0; i <= facts.tests.length; i++) found.add(i);
   return [...found];
 }
