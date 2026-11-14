@@ -3,7 +3,11 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+# Generous retries so a flaky connection does not fail the whole build.
+RUN npm config set fetch-retries 6 \
+ && npm config set fetch-retry-mintimeout 20000 \
+ && npm config set fetch-retry-maxtimeout 120000 \
+ && npm ci --no-audit --no-fund
 
 FROM node:22-alpine AS build
 WORKDIR /app
