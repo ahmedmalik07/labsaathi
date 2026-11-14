@@ -36,8 +36,6 @@ export interface EngineOptions {
   contextText?: string;
 }
 
-const cite = (s: SourceRef) => `${s.file}:${s.line}`;
-
 function rule(tables: ReferenceTables, id: RuleRef["id"]): RuleRef | undefined {
   return tables.rules.find((r) => r.id === id);
 }
@@ -337,7 +335,7 @@ function unclassified(result: TestResult, reason: string, tables: ReferenceTable
 }
 
 export function classifyTest(test: ParsedTest, resolution: NameResolution, ctx: Context): TestResult {
-  const { tables, patient } = ctx;
+  const { tables } = ctx;
   const trace: TraceStep[] = [
     {
       step: "parse",

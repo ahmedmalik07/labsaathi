@@ -1,26 +1,196 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-text), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --color-ink-950: #050816;
+  --color-ink-900: #080d20;
+  --color-ink-800: #0d1430;
+  --color-ink-700: #141d42;
+  --color-ink-600: #1e2a5a;
+
+  --color-accent: #2dd4bf;
+  --color-accent-strong: #5eead4;
+  --color-accent-deep: #0f766e;
+
+  --color-st-normal: #34d399;
+  --color-st-warn: #fbbf24;
+  --color-st-urgent: #f87171;
+  --color-st-unknown: #94a3b8;
+  --color-st-info: #a78bfa;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: #050816;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(45, 212, 191, 0.1), transparent 60%),
+    radial-gradient(900px 600px at -10% 20%, rgba(99, 102, 241, 0.12), transparent 60%),
+    linear-gradient(180deg, #050816 0%, #080d20 45%, #050816 100%);
+  background-attachment: fixed;
+  color: #e6ebf7;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(45, 212, 191, 0.35);
+}
+
+/* ---- glass panels ---------------------------------------------------------- */
+.glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 24px 60px -30px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.glass-strong {
+  background: linear-gradient(180deg, rgba(13, 20, 48, 0.86), rgba(8, 13, 32, 0.86));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.07) inset,
+    0 30px 80px -30px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.hairline {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Static fallback for the 3D hero (reduced motion, weak devices, no WebGL). */
+.hero-static {
+  background:
+    radial-gradient(340px 200px at 18% 30%, rgba(225, 29, 72, 0.22), transparent 70%),
+    radial-gradient(260px 170px at 78% 22%, rgba(225, 29, 72, 0.16), transparent 70%),
+    radial-gradient(420px 260px at 62% 78%, rgba(190, 18, 60, 0.18), transparent 70%),
+    radial-gradient(300px 200px at 30% 85%, rgba(45, 212, 191, 0.1), transparent 70%);
+}
+
+.hero-fade {
+  background: linear-gradient(180deg, rgba(5, 8, 22, 0.35) 0%, rgba(5, 8, 22, 0.15) 40%, rgba(5, 8, 22, 0.92) 100%);
+}
+
+/* ---- focus, scrollbars ----------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* ---- urgent pulse (CSS fallback tube and banner) ---------------------------- */
+@keyframes urgent-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(248, 113, 113, 0);
+  }
+}
+.urgent-pulse {
+  animation: urgent-pulse 1.6s ease-out infinite;
+}
+
+@keyframes liquid-glow {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.liquid-urgent {
+  animation: liquid-glow 1.1s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .urgent-pulse,
+  .liquid-urgent,
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* ---- print: only the doctor sheet ------------------------------------------ */
+.print-only {
+  display: none;
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .print-sheet,
+  .print-sheet * {
+    visibility: visible;
+  }
+  .print-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 0;
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .print-sheet * {
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .print-only {
+    display: block;
+  }
+  .no-print {
+    display: none !important;
+  }
+  @page {
+    margin: 16mm;
+  }
 }
