@@ -1,0 +1,24 @@
+# One service is all LabSaathi needs: the Next.js server holds the UI, the API
+# and the rules engine. There is no database and no vector store, because the
+# reference sheets are parsed into typed tables at build time.
+#
+#   cp .env.example .env      # then put your Groq key in .env
+#   docker compose up --build
+#   open http://localhost:3000
+#
+# Without a GROQ_API_KEY the app still starts: classifications work and the
+# explanations use the built-in template.
+
+services:
+  labsaathi:
+    build: .
+    image: labsaathi:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-120b}
+      GROQ_FALLBACK_MODEL: ${GROQ_FALLBACK_MODEL:-openai/gpt-oss-20b}
+      SESSION_SECRET: ${SESSION_SECRET:-change-me-to-a-long-random-string}
+      LABSAATHI_STRICT_NAMES: ${LABSAATHI_STRICT_NAMES:-0}
+    restart: unless-stopped
