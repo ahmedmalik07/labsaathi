@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import type { ChatReply } from "@/lib/chat";
 import type { Explanation, Patient, TestResult } from "@/lib/types";
+import PrintSheet from "./PrintSheet";
+import { useSpeech } from "./useSpeech";
 
 export type Lang = "en" | "roman-urdu";
 type TabId = "explain" | "questions" | "chat";
@@ -23,6 +25,7 @@ interface Props {
   results: TestResult[];
   sessionId: string;
   lang: Lang;
+  urgentMessage: string | null;
 }
 
 const TABS: Array<{ id: TabId; label: string }> = [
@@ -52,7 +55,8 @@ function SourceBadge({ explanation }: { explanation: Explanation }) {
   );
 }
 
-export default function ExplainTabs({ explanation, explanationBusy, patient, results, sessionId, lang }: Props) {
+export default function ExplainTabs({ explanation, explanationBusy, patient, results, sessionId, lang, urgentMessage }: Props) {
+  const speech = useSpeech();
   const [tab, setTab] = useState<TabId>("explain");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -64,6 +68,12 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
     setMessages([]);
     setDraft("");
   }, [sessionId]);
+
+  // Stop reading when the text underneath changes.
+  const stopSpeech = speech.stop;
+  useEffect(() => stopSpeech, [explanation, tab, stopSpeech]);
+
+  const spokenText = [explanation.overview, ...explanation.tests.map((t) => `${t.test}. ${t.measures} ${t.meaning}`), explanation.disclaimer].join(" ");
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
@@ -135,6 +145,19 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
             <div>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <SourceBadge explanation={explanation} />
+                {speech.supported && (
+                  <button
+                    type="button"
+                    onClick={() => (speech.speaking ? speech.stop() : speech.speak(spokenText, lang))}
+                    aria-pressed={speech.speaking}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3.5 py-1.5 text-sm font-medium text-white transition hover:border-teal-300/60 hover:bg-teal-400/10"
+                  >
+                    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                      {speech.speaking ? <path d="M6 5h3v10H6zM11 5h3v10h-3z" fill="currentColor" stroke="none" /> : <path d="M3.5 8v4h3l4 3.5v-11l-4 3.500zM13.5 7.500a3.500 3.500 0 010 5M15.500 5a7 7 0 010 10" strokeLinecap="round" strokeLinejoin="round" />}
+                    </svg>
+                    {speech.speaking ? "Stop reading" : "Read aloud"}
+                  </button>
+                )}
               </div>
               <div className={`mt-4 transition-opacity ${explanationBusy ? "opacity-40" : ""}`} aria-busy={explanationBusy}>
                 <p className="text-lg leading-relaxed text-white">{explanation.overview}</p>
@@ -167,6 +190,16 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
             <div>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-slate-200">Take these to your appointment. They are based on the results that were not normal.</p>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-2 rounded-full bg-teal-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-teal-200"
+                >
+                  <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                    <path d="M6 7V3h8v4M6 14H4.500A1.500 1.500 0 013 12.500v-4A1.500 1.500 0 014.500 7h11A1.500 1.500 0 0117 8.500v4a1.500 1.500 0 01-1.500 1.500H14M6 11.500h8V17H6z" strokeLinejoin="round" />
+                  </svg>
+                  Print this sheet
+                </button>
               </div>
               <ol className="mt-5 grid gap-3">
                 {explanation.doctorQuestions.map((q, i) => (
@@ -259,6 +292,7 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
           )}
         </motion.div>
       </AnimatePresence>
+      <PrintSheet patient={patient} results={results} explanation={explanation} urgentMessage={urgentMessage} />
     </section>
   );
 }

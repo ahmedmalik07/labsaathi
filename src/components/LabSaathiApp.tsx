@@ -150,7 +150,7 @@ export default function LabSaathiApp() {
                   type="button"
                   aria-pressed={lang === id}
                   onClick={() => switchLang(id)}
-                  className={`rounded-full px-3 py-1.5 transition ${lang === id ? "bg-teal-300 text-slate-950" : "text-slate-100 hover:bg-white/10"}`}
+                  className={`rounded-full px-2.5 py-1.5 whitespace-nowrap transition sm:px-3 ${lang === id ? "bg-teal-300 text-slate-950" : "text-slate-100 hover:bg-white/10"}`}
                 >
                   {label}
                 </button>
@@ -268,7 +268,7 @@ export default function LabSaathiApp() {
                 )}
 
                 {data.results.length > 0 && (
-                  <ExplainTabs explanation={explanation} explanationBusy={explanationBusy} patient={data.patient} results={data.results} sessionId={data.sessionId} lang={lang} />
+                  <ExplainTabs explanation={explanation} explanationBusy={explanationBusy} patient={data.patient} results={data.results} sessionId={data.sessionId} lang={lang} urgentMessage={data.urgentMessage} />
                 )}
 
                 <div className="no-print glass rounded-3xl">

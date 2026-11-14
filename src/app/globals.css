@@ -150,7 +150,8 @@ body {
 }
 
 /* ---- print: only the doctor sheet ------------------------------------------ */
-.print-only {
+/* The sheet is mounted directly under <body> (see PrintSheet.tsx). */
+.print-sheet {
   display: none;
 }
 
@@ -160,35 +161,14 @@ body {
     background: #ffffff !important;
     color: #111827 !important;
   }
-  body * {
-    visibility: hidden;
-  }
-  .print-sheet,
-  .print-sheet * {
-    visibility: visible;
+  body > *:not(.print-sheet) {
+    display: none !important;
   }
   .print-sheet {
-    position: absolute;
-    inset: 0 auto auto 0;
-    width: 100%;
-    padding: 0;
-    background: #ffffff !important;
-    color: #111827 !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-  }
-  .print-sheet * {
-    color: #111827 !important;
-    border-color: #d1d5db !important;
-    background: transparent !important;
-    box-shadow: none !important;
-  }
-  .print-only {
-    display: block;
-  }
-  .no-print {
-    display: none !important;
+    display: block !important;
+    color: #111827;
+    font-family: var(--font-sans);
+    line-height: 1.45;
   }
   @page {
     margin: 16mm;

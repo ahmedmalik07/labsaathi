@@ -43,7 +43,7 @@ export function explainerSystemPrompt(lang: Lang): string {
     '  "doctorQuestions": 3 to 5 questions the patient can ask the doctor, written as the patient ("Why is my ..."), about the abnormal or unclassified results first.',
     "",
     lang === "roman-urdu"
-      ? "Language: write every sentence in Roman Urdu (Urdu written in English letters, the way people in Pakistan text). Keep test names, units and numbers exactly as in FACTS."
+      ? "Language: write every sentence in Roman Urdu (Urdu written in English letters, the way people in Pakistan text). This includes every item of doctorQuestions, for example \"Mera ... kyun zyada hai?\". Do not write any English sentence. Keep test names, units and numbers exactly as in FACTS."
       : "Language: simple English.",
   ].join("\n");
 }
