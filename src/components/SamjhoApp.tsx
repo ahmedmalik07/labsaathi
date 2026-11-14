@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AnalyzeResponse } from "@/lib/pipeline";
 import type { Explanation } from "@/lib/types";
+import Closing from "./Closing";
 import ExplainTabs, { type Lang } from "./ExplainTabs";
 import Hero, { type SampleInfo } from "./Hero";
 import History, { Profiles } from "./History";
@@ -348,6 +349,8 @@ export default function SamjhoApp() {
 
 
         <Profiles />
+
+        <Closing use3D={threeD.enabled} />
       </main>
 
       <footer className="no-print border-t border-ink/10 bg-ink text-white">

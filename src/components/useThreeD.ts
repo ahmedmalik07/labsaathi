@@ -5,20 +5,21 @@ import { useEffect, useState } from "react";
 /**
  * Decides whether 3D may run. It starts as false, so the first paint is always
  * the static version and the page is usable before any WebGL code loads.
- * 3D stays off for prefers-reduced-motion, data-saver, weak devices and
- * browsers without WebGL.
+ *
+ * 3D stays on for reduced-motion users (the scenes are slow and calm), and is
+ * only switched off when the browser has no WebGL or the user asked to save data.
+ * Add ?3d=0 to the URL to force it off, ?3d=1 to force it on.
  */
 export function useThreeD(): { enabled: boolean; reason: string; disable: () => void } {
   const [state, setState] = useState<{ enabled: boolean; reason: string }>({ enabled: false, reason: "loading" });
 
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const force = new URLSearchParams(window.location.search).get("3d");
     const decide = () => {
-      if (reduce.matches) return { enabled: false, reason: "reduced motion is on" };
-      const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+      if (force === "0") return { enabled: false, reason: "turned off with ?3d=0" };
+      if (force === "1") return { enabled: true, reason: "forced on with ?3d=1" };
+      const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
       if (nav.connection?.saveData) return { enabled: false, reason: "data saver is on" };
-      if ((nav.hardwareConcurrency ?? 8) <= 2) return { enabled: false, reason: "low-power device" };
-      if (nav.deviceMemory !== undefined && nav.deviceMemory <= 2) return { enabled: false, reason: "low-memory device" };
       try {
         const canvas = document.createElement("canvas");
         const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
@@ -28,11 +29,10 @@ export function useThreeD(): { enabled: boolean; reason: string; disable: () => 
       }
       return { enabled: true, reason: "ok" };
     };
-    const apply = () => setState(decide());
-    apply();
-    reduce.addEventListener("change", apply);
-    return () => reduce.removeEventListener("change", apply);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- capability check after mount
+    setState(decide());
   }, []);
 
-  return { ...state, disable: () => setState({ enabled: false, reason: "the device could not keep a smooth frame rate" }) };
+  // A slow frame rate no longer switches 3D off: the scenes lower their own resolution instead.
+  return { ...state, disable: () => undefined };
 }

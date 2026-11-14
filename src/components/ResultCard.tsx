@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useId, useState } from "react";
 import type { TestResult } from "@/lib/types";
 import { STATUS, STEP_LABEL } from "./status";
+import TestIcon from "./TestIcon";
 import TestTube from "./TestTube";
 
 function rangeText(r: TestResult): string | null {
@@ -57,13 +58,16 @@ export default function ResultCard({ result, index, use3D }: { result: TestResul
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-2">
-            <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-3">
+              <TestIcon name={result.canonicalName} color={meta.color} urgent={result.status === "urgent"} />
+              <div className="min-w-0">
               <h3 className="font-display text-3xl leading-none font-semibold text-ink">{result.canonicalName}</h3>
               {renamed && (
                 <p className="mt-1 text-sm text-muted">
                   Written on the report as <span className="rounded-md bg-cream-deep px-1.5 py-0.5 font-mono text-[0.8rem] text-ink">{result.originalName}</span>
                 </p>
               )}
+              </div>
             </div>
             <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold tracking-wide uppercase ${meta.pill}`}>
                             {meta.label}
