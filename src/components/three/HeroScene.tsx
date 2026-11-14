@@ -90,7 +90,7 @@ function Cells({ count }: { count: number }) {
 
   return (
     <instancedMesh ref={mesh} args={[geometry, undefined, count]} frustumCulled={false}>
-      <meshStandardMaterial color="#c2183a" emissive="#5a0a1c" emissiveIntensity={0.55} roughness={0.38} metalness={0.05} />
+      <meshStandardMaterial color="#d2302f" emissive="#7a1410" emissiveIntensity={0.35} roughness={0.45} metalness={0.02} />
     </instancedMesh>
   );
 }
@@ -121,7 +121,7 @@ function Parallax() {
 export default function HeroScene({ onGiveUp }: { onGiveUp?: () => void }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(true);
-  const [count] = useState(() => (typeof window !== "undefined" && window.innerWidth < 720 ? 46 : 96));
+  const [count] = useState(() => (typeof window !== "undefined" && window.innerWidth < 720 ? 26 : 54));
 
   useEffect(() => {
     const el = wrap.current;
@@ -140,10 +140,10 @@ export default function HeroScene({ onGiveUp }: { onGiveUp?: () => void }) {
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       >
-        <fog attach="fog" args={["#060a1c", 7, 27]} />
-        <ambientLight intensity={0.55} color="#8fa4ff" />
+        <fog attach="fog" args={["#fbeee0", 6, 24]} />
+        <ambientLight intensity={1.25} color="#fff1e6" />
         <directionalLight position={[6, 8, 6]} intensity={2.1} color="#ffd9df" />
-        <directionalLight position={[-8, -3, 2]} intensity={1.1} color="#2dd4bf" />
+        <directionalLight position={[-8, -3, 2]} intensity={0.9} color="#ffd9c7" />
         <pointLight position={[0, 0, 5]} intensity={22} distance={22} color="#ff5b7f" />
         <Cells count={count} />
         <Parallax />

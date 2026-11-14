@@ -24,13 +24,13 @@ export function TubeFallback({ level, color, urgent, showMarks }: { level: numbe
         <rect x="18" y={fillTop} width="28" height={bottom - fillTop + 8} fill={`url(#${id})`} className={urgent ? "liquid-urgent" : undefined} />
         <rect x="18" y={fillTop} width="28" height="2.5" fill="#ffffff" opacity="0.55" />
       </g>
-      <path d="M18 8 H46 V136 A14 14 0 0 1 18 136 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(226,240,255,0.55)" strokeWidth="1.6" />
-      <rect x="14" y="4" width="36" height="6" rx="3" fill="rgba(226,240,255,0.5)" />
+      <path d="M18 8 H46 V136 A14 14 0 0 1 18 136 Z" fill="rgba(22,19,15,0.04)" stroke="#16130f" strokeWidth="1.6" />
+      <rect x="14" y="4" width="36" height="6" rx="3" fill="#16130f" />
       <rect x="22" y="16" width="3" height="104" rx="1.5" fill="#ffffff" opacity="0.18" />
       {showMarks &&
         [0.25, 0.75].map((p) => (
           <g key={p}>
-            <line x1="14" x2="50" y1={mark(p)} y2={mark(p)} stroke="#ffffff" strokeOpacity="0.8" strokeWidth="1.2" strokeDasharray="3 2" />
+            <line x1="14" x2="50" y1={mark(p)} y2={mark(p)} stroke="#16130f" strokeOpacity="0.7" strokeWidth="1.2" strokeDasharray="3 2" />
           </g>
         ))}
     </svg>

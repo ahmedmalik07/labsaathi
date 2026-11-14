@@ -29,21 +29,21 @@ export default function NeedsInfoForm({ needsInfo, busy, onSubmit }: Props) {
         e.preventDefault();
         if (ready) onSubmit({ age: age || undefined, sex: sex || undefined });
       }}
-      className="rounded-3xl border border-violet-300/45 bg-violet-500/10 p-5 backdrop-blur sm:p-6"
+      className="rounded-3xl border-2 border-info bg-white p-5 sm:p-6"
       aria-label="Missing patient details"
     >
       <div className="flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-300 text-lg font-bold text-slate-950" aria-hidden="true">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-info text-xl font-bold text-white" aria-hidden="true">
           ?
         </span>
         <div className="min-w-0">
-          <h3 className="font-display text-lg font-semibold text-white">{blocking ? "I need one more detail before I can label this" : "One detail is missing from the report"}</h3>
-          <ul className="mt-1 grid gap-1 text-[0.95rem] leading-relaxed text-violet-50">
+          <h3 className="font-display text-3xl leading-tight font-semibold text-ink">{blocking ? "I need one more detail before I can label this" : "One detail is missing from the report"}</h3>
+          <ul className="mt-1 grid gap-1 text-[0.95rem] leading-relaxed text-ink">
             {needsInfo.map((n) => (
               <li key={n.field}>{n.question}</li>
             ))}
           </ul>
-          <p className="mt-2 text-sm text-violet-100/90">
+          <p className="mt-2 text-sm text-ink">
             Nothing is guessed. Sex is never read from a name.
             {source && (
               <>
@@ -57,7 +57,7 @@ export default function NeedsInfoForm({ needsInfo, busy, onSubmit }: Props) {
 
       <div className="mt-4 flex flex-wrap items-end gap-3">
         {asksAge && (
-          <label className="grid gap-1.5 text-sm font-medium text-white">
+          <label className="grid gap-1.5 text-sm font-medium text-ink">
             Age in years
             <input
               inputMode="numeric"
@@ -65,13 +65,13 @@ export default function NeedsInfoForm({ needsInfo, busy, onSubmit }: Props) {
               onChange={(e) => setAge(e.target.value.replace(/[^\d]/g, "").slice(0, 3))}
               placeholder="e.g. 42"
               aria-invalid={!ageValid}
-              className="w-32 rounded-xl border border-white/25 bg-black/30 px-3.5 py-2.5 text-base text-white placeholder:text-slate-400 focus:border-violet-300 focus:outline-none"
+              className="w-32 rounded-xl border border-ink/15 bg-cream-deep/60 px-3.5 py-2.5 text-base text-ink placeholder:text-muted focus:border-info focus:outline-none"
             />
           </label>
         )}
         {asksSex && (
           <fieldset className="grid gap-1.5">
-            <legend className="mb-1.5 text-sm font-medium text-white">Biological sex</legend>
+            <legend className="mb-1.5 text-sm font-medium text-ink">Biological sex</legend>
             <div className="flex gap-2">
               {[
                 ["female", "Female"],
@@ -80,7 +80,7 @@ export default function NeedsInfoForm({ needsInfo, busy, onSubmit }: Props) {
                 <label
                   key={value}
                   className={`cursor-pointer rounded-xl border px-4 py-2.5 text-base font-medium transition ${
-                    sex === value ? "border-violet-200 bg-violet-300 text-slate-950" : "border-white/25 bg-black/30 text-white hover:border-violet-300"
+                    sex === value ? "border-ink bg-ink text-white" : "border-ink/15 bg-cream-deep/60 text-ink hover:border-info"
                   }`}
                 >
                   <input type="radio" name="sex" value={value} checked={sex === value} onChange={() => setSex(value)} className="sr-only" />
@@ -90,7 +90,7 @@ export default function NeedsInfoForm({ needsInfo, busy, onSubmit }: Props) {
             </div>
           </fieldset>
         )}
-        <button type="submit" disabled={!ready || busy} className="rounded-xl bg-violet-300 px-5 py-2.5 text-base font-semibold text-slate-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="submit" disabled={!ready || busy} className="rounded-xl bg-ink px-5 py-2.5 text-base font-semibold text-white transition hover:bg-ink/85 disabled:cursor-not-allowed disabled:opacity-50">
           {busy ? "Re-checking..." : "Update results"}
         </button>
       </div>

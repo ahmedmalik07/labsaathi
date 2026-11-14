@@ -1,5 +1,5 @@
 /**
- * Shared types for the LabSaathi pipeline.
+ * Shared types for the Samjho pipeline.
  * cleaner -> reference loader -> report parser -> rules engine -> explainer -> guard
  */
 

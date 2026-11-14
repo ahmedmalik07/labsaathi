@@ -1,5 +1,5 @@
-import LabSaathiApp from "@/components/LabSaathiApp";
+import SamjhoApp from "@/components/SamjhoApp";
 
 export default function Home() {
-  return <LabSaathiApp />;
+  return <SamjhoApp />;
 }

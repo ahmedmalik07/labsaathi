@@ -28,7 +28,7 @@ export default function PrintSheet({ patient, results, explanation, urgentMessag
     <div className="print-sheet">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: "2px solid #111827", paddingBottom: 8 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Questions for my doctor</h1>
-        <p style={{ fontSize: 12, margin: 0 }}>LabSaathi · {today}</p>
+        <p style={{ fontSize: 12, margin: 0 }}>Samjho · {today}</p>
       </div>
 
       <p style={{ fontSize: 13, marginTop: 12 }}>

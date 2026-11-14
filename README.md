@@ -1,16 +1,18 @@
-# LabSaathi
+# Samjho
+
+*Samjho* means "understand" in Urdu. (The repository and Vercel project keep the working name `labsaathi`.)
 
 **Your lab report, in words you actually understand.**
 Tech Fusion '26 AI Hackathon, Problem Statement B: Medical Lab Report Explainer.
 
 | | |
 | :--- | :--- |
-| **Live app** | https://labsaathi.vercel.app (custom domain `techfusion.wyibe.com` is attached, waiting on DNS) |
+| **Live app** | https://techfusion.wyibe.com (also https://labsaathi.vercel.app) |
 | **Live test results** | https://labsaathi.vercel.app/evals |
 | **API** | `POST https://labsaathi.vercel.app/api/analyze` |
 | **Health** | https://labsaathi.vercel.app/api/health |
 
-LabSaathi reads a CityLab report, checks every value against the lab's own reference sheets, shows its working with file citations, and explains the result in plain English or Roman Urdu. A tested rules engine decides normal, low, high and urgent. The language model only words the explanation, and its text is checked before anyone sees it.
+Samjho reads a CityLab report, checks every value against the lab's own reference sheets, shows its working with file citations, and explains the result in plain English or Roman Urdu. A tested rules engine decides normal, low, high and urgent. The language model only words the explanation, and its text is checked before anyone sees it.
 
 ---
 
@@ -18,7 +20,7 @@ LabSaathi reads a CityLab report, checks every value against the lab's own refer
 
 CityLab publishes 14 patient reports and 6 reference files (safety rules, glossary, urgent values, three range sheets). Every file is about 2,000 words long, and about 96% of that is repeated legal and compliance boilerplate. The task is a bot that explains one patient's results in plain language and gets the hard parts right:
 
-| Organiser checkpoint | What LabSaathi does | Where |
+| Organiser checkpoint | What Samjho does | Where |
 | :--- | :--- | :--- |
 | 1. Match names and units | Resolves aliases through the glossary (SGPT, SGOT, FBS, Hb, PLT, RBC, WBC, any letter case). Converts units before comparing and shows the conversion as a step. | `src/lib/engine.ts` |
 | 2. Handle edge cases | A value exactly on a limit is NORMAL. Age bounds are inclusive. Missing or unreadable age or sex triggers a question, never a guess. Sex is never read from a name. | `src/lib/engine.ts`, `src/lib/parser.ts` |
@@ -183,7 +185,7 @@ One container is enough: the Next.js server holds the UI, the API and the rules 
 
 ## 5. Test results
 
-`npm test` runs **264 tests in 6 files, all passing** (about 0.8 s).
+`npm test` runs **267 tests in 7 files, all passing** (about 0.8 s).
 
 | File | What it covers |
 | :--- | :--- |
@@ -192,6 +194,7 @@ One container is enough: the Next.js server holds the UI, the API and the rules 
 | `tests/reference.test.ts` | The loader output equals the generated knowledge base, and every number appears on the line it cites. |
 | `tests/parser.test.ts` | 13 layouts, placeholders, all 14 sample files, noise lines that must be ignored. |
 | `tests/privacy.test.ts` | 13 messages that must be refused, 8 that must be allowed. |
+| `tests/demo.test.ts` | The three downloadable demo reports in `public/demo/` behave exactly as described below. |
 | `tests/guard.test.ts` | Guard accepts and rejects, template passes its own guard for every sample in both languages, LLM extraction rejects invented values, session tokens cannot be spliced, backoff maths. |
 
 The 14 sample reports:
@@ -289,10 +292,10 @@ These were judgement calls. Each is one switch or one function, so it is easy to
 
 ## 9. Known failure cases
 
-Honest list. These are the places where LabSaathi can be wrong or will refuse.
+Honest list. These are the places where Samjho can be wrong or will refuse.
 
 1. **The glucose conversion factor is not in the files.** The organiser README says reports use mmol/L, but no file gives the factor. We use mg/dL = mmol/L × 18 (from the hackathon brief), only for Fasting Blood Sugar, and the trace says the factor is not from the files. Cholesterol in mmol/L is *not* converted and comes back "cannot be classified from the files", because that factor is not in the files either.
-2. **Urine test names are matched by context.** Report P008 says "pH Level" and "Protein". The glossary has neither, and the range sheet only has "Urine pH" and "Urine Protein". With strict mode off (default) LabSaathi matches them when the report text or file name mentions urine, or when *every* test on the report only fits urine tests and there are at least two. The trace says "matched by context". This can be wrong: a report that lists only "pH" and "Protein" from another specimen would be read as urine. A single "Total Protein" inside a liver panel is not matched. Set `LABSAATHI_STRICT_NAMES=1` to turn this off; P008 then returns "cannot be classified".
+2. **Urine test names are matched by context.** Report P008 says "pH Level" and "Protein". The glossary has neither, and the range sheet only has "Urine pH" and "Urine Protein". With strict mode off (default) Samjho matches them when the report text or file name mentions urine, or when *every* test on the report only fits urine tests and there are at least two. The trace says "matched by context". This can be wrong: a report that lists only "pH" and "Protein" from another specimen would be read as urine. A single "Total Protein" inside a liver panel is not matched. Set `LABSAATHI_STRICT_NAMES=1` to turn this off; P008 then returns "cannot be classified".
 3. **"Hit or pass" versus "Less than".** File 3 contradicts itself. We treat a value equal to the threshold (Hemoglobin 7.0, FBS 300, Platelets 50000, ALT 1000) as urgent. If the grader reads the table literally, those four exact values will differ. It is one comparison in `isUrgent()`.
 4. **Ages outside 18 to 100.** Every range in the files covers 18 to 100 only. A 17-year-old or a 101-year-old gets "cannot be classified from the files" for every range-based test. That is correct by the rules and unhelpful for children.
 5. **Name matching beyond the glossary is shallow.** With strict mode off, plural endings, word order, filler words (count, level, total) and a leading Serum or Plasma are ignored, so "Platelets", "Blood Sugar (Fasting)", "Total Cholesterol" and "Serum ALT" match. Real synonyms that are not in the glossary do not: "Fasting Glucose", "Haemoglobin" (British spelling), "Thyroid Stimulating Hormone". "Random Blood Sugar" and "HDL Cholesterol" are correctly left alone. Unmatched names come back "cannot be classified", which is safe but can under-report. Ignoring "Serum" is a small step outside the glossary; strict mode turns it off.
@@ -342,14 +345,25 @@ tests/                  Vitest suites
 
 - React Three Fiber and drei: an instanced mesh of biconcave red blood cells with depth fog and pointer parallax in the hero, and a 3D test tube on each result card. The liquid level shows where the value sits in its range (the two rings are the low and high limits) and the colour is the status. Urgent tubes pulse.
 - 3D never blocks the product. It is loaded with `next/dynamic` and `ssr: false` after first paint. The first paint is always a static gradient and SVG tubes. 3D stays off for `prefers-reduced-motion`, data saver, low-power devices and browsers without WebGL, and switches itself off if the frame rate drops. Only the first 6 cards get a WebGL tube.
-- Status colours: green normal, amber low or high, red urgent, slate cannot classify, violet needs info.
+- Look: warm paper background, ink text, one orange accent, a serif display face (Cormorant Garamond) with Figtree for text. Status colours: green normal, amber low or high, red urgent, grey cannot classify, blue needs info.
+- The page tells a short story below the tool: the report as it arrives, the confusion, the 2 a.m. search, and the same report read against the lab's sheets.
 - Roman Urdu toggle, read-aloud (browser Web Speech API), and a printable "Questions for my doctor" sheet.
 
-## 12. Hackathon rules
+## 12. Demo reports
+
+Three extra reports for a live demo are in `public/demo/` and can be downloaded from the home page. They are new patients, not part of the corpus, and the engine has no special knowledge of them.
+
+| File | What it shows |
+| :--- | :--- |
+| `demo_1_ayesha_full_checkup.md` | All seven kinds of test in one table. Hb 6.8 is urgent, PLT 148000 is low, SGPT 45 and Cholesterol 200 sit exactly on the limit and are normal, FBS 5.2 mmol/L converts to 93.6 mg/dL, TSH 4.6 is high. |
+| `demo_2_bilal_missing_details.md` | Age and sex are missing, so nothing is labelled and the app asks. Answer "male, 40" and SGOT 44 is normal; answer "female" and it is high. |
+| `demo_3_sana_messy_layout.md` | No markdown, mixed separators, "Age/Sex: 52/F". FBS 17 mmol/L becomes 306 mg/dL and is urgent. Ferritin, RBC and Cholesterol in mmol/L come back "cannot be classified". Urine Protein "Trace" is abnormal. |
+
+## 13. Hackathon rules
 
 - Knowledge source: `lab_reports/` only, untouched. Classifications use no outside medical knowledge.
 - AI: Groq free tier, open-weight models, no fine-tuning.
 - Code: written for this hackathon. `create-next-app` is the only scaffold.
 - Secrets: `.env*` is git-ignored. Keys live in Vercel environment variables.
 
-*LabSaathi explains numbers. Only a licensed medical doctor can diagnose conditions.*
+*Samjho explains numbers. Only a licensed medical doctor can diagnose conditions.*

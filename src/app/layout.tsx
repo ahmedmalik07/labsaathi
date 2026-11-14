@@ -1,18 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Sora } from "next/font/google";
+import { Cormorant_Garamond, Figtree } from "next/font/google";
 import "./globals.css";
 
-const display = Sora({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"], display: "swap" });
-const text = Inter({ variable: "--font-text", subsets: ["latin"], display: "swap" });
+const display = Cormorant_Garamond({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"], style: ["normal", "italic"], display: "swap" });
+const text = Figtree({ variable: "--font-text", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "LabSaathi: your lab report in plain words",
+  title: "Samjho · your lab report in plain words",
   description:
-    "LabSaathi checks every value on a lab report against the lab's own reference sheets and explains it in plain English or Roman Urdu. It never guesses and never diagnoses.",
+    "Samjho checks every value on a lab report against the lab's own reference sheets and explains it in plain English or Roman Urdu. It never guesses and never diagnoses.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050816",
+  themeColor: "#fbeee0",
   width: "device-width",
   initialScale: 1,
 };

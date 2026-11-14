@@ -39,7 +39,7 @@ function SourceBadge({ explanation }: { explanation: Explanation }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
-        llm ? "border-teal-300/40 bg-teal-400/10 text-teal-100" : "border-slate-300/40 bg-slate-400/10 text-slate-100"
+        llm ? "border-forest/40 bg-forest/10 text-forest" : "border-ink/25 bg-cream-deep text-ink"
       }`}
       title={
         llm
@@ -49,8 +49,8 @@ function SourceBadge({ explanation }: { explanation: Explanation }) {
             : "The language model was not available, so the built-in template is shown."
       }
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${llm ? "bg-teal-300" : "bg-slate-300"}`} aria-hidden="true" />
-      {llm ? "AI wording, safety-checked" : "Built-in wording (AI unavailable or rejected)"}
+      <span className={`h-1.5 w-1.5 rounded-full ${llm ? "bg-forest" : "bg-muted"}`} aria-hidden="true" />
+      {llm ? "Wording checked before you saw it" : "Plain wording (the writing model was unavailable)"}
     </span>
   );
 }
@@ -110,8 +110,8 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
       : [`What does ${firstTest} mean?`, "Should I be worried?", "Show me another patient's report"];
 
   return (
-    <section className="glass-strong overflow-hidden rounded-3xl" aria-label="Explanation">
-      <div role="tablist" aria-label="Explanation views" className="thin-scroll flex gap-1 overflow-x-auto border-b border-white/10 p-2">
+    <section className="overflow-hidden rounded-3xl border border-ink/15 bg-white" aria-label="Explanation">
+      <div role="tablist" aria-label="Explanation views" className="thin-scroll flex gap-1 overflow-x-auto border-b border-ink/15 p-2">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -121,9 +121,9 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
             aria-selected={tab === t.id}
             aria-controls={`panel-${t.id}`}
             onClick={() => setTab(t.id)}
-            className={`relative shrink-0 rounded-2xl px-4 py-2.5 text-sm font-semibold transition ${tab === t.id ? "text-slate-950" : "text-slate-200 hover:bg-white/5"}`}
+            className={`relative shrink-0 rounded-full px-4 py-2.5 text-sm font-semibold transition ${tab === t.id ? "text-white" : "text-ink hover:bg-ink/5"}`}
           >
-            {tab === t.id && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-2xl bg-teal-300" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+            {tab === t.id && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-full bg-ink" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
             <span className="relative">{t.label}</span>
           </button>
         ))}
@@ -150,7 +150,7 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
                     type="button"
                     onClick={() => (speech.speaking ? speech.stop() : speech.speak(spokenText, lang))}
                     aria-pressed={speech.speaking}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3.5 py-1.5 text-sm font-medium text-white transition hover:border-teal-300/60 hover:bg-teal-400/10"
+                    className="inline-flex items-center gap-2 rounded-full border border-ink/15 bg-white px-3.5 py-1.5 text-sm font-medium text-ink transition hover:border-brand hover:bg-brand/10"
                   >
                     <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                       {speech.speaking ? <path d="M6 5h3v10H6zM11 5h3v10h-3z" fill="currentColor" stroke="none" /> : <path d="M3.5 8v4h3l4 3.5v-11l-4 3.500zM13.5 7.500a3.500 3.500 0 010 5M15.500 5a7 7 0 010 10" strokeLinecap="round" strokeLinejoin="round" />}
@@ -160,24 +160,24 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
                 )}
               </div>
               <div className={`mt-4 transition-opacity ${explanationBusy ? "opacity-40" : ""}`} aria-busy={explanationBusy}>
-                <p className="text-lg leading-relaxed text-white">{explanation.overview}</p>
+                <p className="text-lg leading-relaxed text-ink">{explanation.overview}</p>
                 <div className="mt-6 grid gap-4">
                   {explanation.tests.map((t) => (
-                    <div key={t.test} className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
-                      <h4 className="font-display text-base font-semibold text-teal-200">{t.test}</h4>
-                      <p className="mt-2 text-[0.97rem] leading-relaxed text-slate-100">
-                        <span className="font-semibold text-white">{lang === "roman-urdu" ? "Yeh kya naapta hai: " : "What it measures: "}</span>
+                    <div key={t.test} className="rounded-2xl border border-ink/15 bg-white p-4 sm:p-5">
+                      <h4 className="font-display text-2xl font-semibold text-ink">{t.test}</h4>
+                      <p className="mt-2 text-[0.97rem] leading-relaxed text-ink/85">
+                        <span className="font-semibold text-ink">{lang === "roman-urdu" ? "Yeh kya naapta hai: " : "What it measures: "}</span>
                         {t.measures}
                       </p>
-                      <p className="mt-2 text-[0.97rem] leading-relaxed text-slate-100">
-                        <span className="font-semibold text-white">{lang === "roman-urdu" ? "Aap ka result: " : "Your result: "}</span>
+                      <p className="mt-2 text-[0.97rem] leading-relaxed text-ink/85">
+                        <span className="font-semibold text-ink">{lang === "roman-urdu" ? "Aap ka result: " : "Your result: "}</span>
                         {t.meaning}
                       </p>
                     </div>
                   ))}
                 </div>
               </div>
-              <p className="mt-6 flex gap-3 rounded-2xl border border-amber-200/30 bg-amber-300/10 p-4 text-sm leading-relaxed text-amber-50">
+              <p className="mt-6 flex gap-3 rounded-2xl border border-sun bg-sun/20 p-4 text-sm leading-relaxed text-ink">
                 <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
                   <path d="M10 6.5v4.5m0 2.5v.5M2.8 16h14.4L10 3.2 2.8 16z" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -189,11 +189,11 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
           {tab === "questions" && (
             <div>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-slate-200">Take these to your appointment. They are based on the results that were not normal.</p>
+                <p className="text-ink/85">Take these to your appointment. They are based on the results that were not normal.</p>
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-2 rounded-full bg-teal-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-teal-200"
+                  className="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark"
                 >
                   <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                     <path d="M6 7V3h8v4M6 14H4.500A1.500 1.500 0 013 12.500v-4A1.500 1.500 0 014.500 7h11A1.500 1.500 0 0117 8.500v4a1.500 1.500 0 01-1.500 1.500H14M6 11.500h8V17H6z" strokeLinejoin="round" />
@@ -203,28 +203,28 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
               </div>
               <ol className="mt-5 grid gap-3">
                 {explanation.doctorQuestions.map((q, i) => (
-                  <li key={q} className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-300 text-sm font-bold text-slate-950">{i + 1}</span>
-                    <span className="text-[0.97rem] leading-relaxed text-slate-100">{q}</span>
+                  <li key={q} className="flex gap-3 rounded-2xl border border-ink/15 bg-white p-4">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">{i + 1}</span>
+                    <span className="text-[0.97rem] leading-relaxed text-ink/85">{q}</span>
                   </li>
                 ))}
               </ol>
-              <p className="mt-5 text-sm text-slate-300">{explanation.disclaimer}</p>
+              <p className="mt-5 text-sm text-muted">{explanation.disclaimer}</p>
             </div>
           )}
 
           {tab === "chat" && (
             <div>
-              <p className="flex items-center gap-2 text-sm text-slate-200">
-                <svg viewBox="0 0 20 20" className="h-4 w-4 text-teal-200" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <p className="flex items-center gap-2 text-sm text-ink/85">
+                <svg viewBox="0 0 20 20" className="h-4 w-4 text-brand" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                   <rect x="4" y="9" width="12" height="8" rx="2" />
                   <path d="M7 9V6.5a3 3 0 016 0V9" strokeLinecap="round" />
                 </svg>
                 Locked to {patient.name ? `${patient.name}'s report` : "this report"}. Questions about anyone else are refused.
               </p>
 
-              <div ref={scroller} className="thin-scroll mt-4 flex max-h-96 min-h-40 flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-black/25 p-4" aria-live="polite">
-                {messages.length === 0 && <p className="m-auto max-w-sm text-center text-sm text-slate-300">Ask anything about the results above. Answers only use the numbers on this report.</p>}
+              <div ref={scroller} className="thin-scroll mt-4 flex max-h-96 min-h-40 flex-col gap-3 overflow-y-auto rounded-2xl border border-ink/15 bg-cream-deep/60 p-4" aria-live="polite">
+                {messages.length === 0 && <p className="m-auto max-w-sm text-center text-sm text-muted">Ask anything about the results above. Answers only use the numbers on this report.</p>}
                 {messages.map((m, i) => (
                   <motion.div
                     key={i}
@@ -232,26 +232,26 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
                     animate={{ opacity: 1, y: 0 }}
                     className={`max-w-[88%] rounded-2xl px-4 py-3 text-[0.95rem] leading-relaxed whitespace-pre-wrap ${
                       m.role === "user"
-                        ? "self-end bg-teal-300 text-slate-950"
+                        ? "self-end bg-ink text-white"
                         : m.refused
-                          ? "self-start border border-violet-300/50 bg-violet-400/15 text-violet-50"
-                          : "self-start border border-white/10 bg-white/10 text-slate-50"
+                          ? "self-start border border-info bg-info/10 text-info"
+                          : "self-start border border-ink/15 bg-white text-ink/85"
                     }`}
                   >
-                    {m.refused && <p className="mb-1 text-xs font-semibold tracking-wide text-violet-200 uppercase">Privacy lock</p>}
+                    {m.refused && <p className="mb-1 text-xs font-semibold tracking-wide text-info uppercase">Privacy lock</p>}
                     {m.content}
                     {m.citation && (
-                      <p className="mt-2 font-mono text-xs text-violet-100">
+                      <p className="mt-2 font-mono text-xs text-info">
                         {m.citation.file}:{m.citation.line}
                       </p>
                     )}
                   </motion.div>
                 ))}
                 {sending && (
-                  <div className="self-start rounded-2xl border border-white/10 bg-white/10 px-4 py-3" aria-label="Writing a reply">
+                  <div className="self-start rounded-2xl border border-ink/15 bg-white px-4 py-3" aria-label="Writing a reply">
                     <span className="inline-flex gap-1">
                       {[0, 1, 2].map((d) => (
-                        <motion.span key={d} className="h-2 w-2 rounded-full bg-teal-200" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: d * 0.18 }} />
+                        <motion.span key={d} className="h-2 w-2 rounded-full bg-ink" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: d * 0.18 }} />
                       ))}
                     </span>
                   </div>
@@ -260,7 +260,7 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {suggestions.map((s) => (
-                  <button key={s} type="button" disabled={sending} onClick={() => send(s)} className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-slate-100 transition hover:border-teal-300/60 hover:bg-teal-400/10 disabled:opacity-50">
+                  <button key={s} type="button" disabled={sending} onClick={() => send(s)} className="rounded-full border border-ink/15 bg-white px-3 py-1.5 text-sm text-ink/85 transition hover:border-brand hover:bg-brand/10 disabled:opacity-50">
                     {s}
                   </button>
                 ))}
@@ -282,9 +282,9 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
                   onChange={(e) => setDraft(e.target.value)}
                   maxLength={600}
                   placeholder={lang === "roman-urdu" ? "Apna sawal likhein..." : "Type your question..."}
-                  className="min-w-0 flex-1 rounded-2xl border border-white/15 bg-black/30 px-4 py-3 text-base text-white placeholder:text-slate-400 focus:border-teal-300 focus:outline-none"
+                  className="min-w-0 flex-1 rounded-2xl border border-ink/15 bg-cream-deep/60 px-4 py-3 text-base text-ink placeholder:text-muted focus:border-brand focus:outline-none"
                 />
-                <button type="submit" disabled={sending || !draft.trim()} className="rounded-2xl bg-teal-300 px-5 py-3 font-semibold text-slate-950 transition hover:bg-teal-200 disabled:opacity-50">
+                <button type="submit" disabled={sending || !draft.trim()} className="rounded-2xl bg-brand px-5 py-3 font-semibold text-white transition hover:bg-brand-dark disabled:opacity-50">
                   Send
                 </button>
               </form>

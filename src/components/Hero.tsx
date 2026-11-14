@@ -26,30 +26,37 @@ interface HeroProps {
   onAnalyze: () => void;
 }
 
+export const DEMO_FILES = [
+  { file: "demo_1_ayesha_full_checkup.md", label: "Ayesha: full check-up, one urgent result" },
+  { file: "demo_2_bilal_missing_details.md", label: "Bilal: age and sex missing" },
+  { file: "demo_3_sana_messy_layout.md", label: "Sana: messy layout, unknown test" },
+];
+
 const fadeUp = {
-  hidden: { opacity: 0, y: 18 },
-  show: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.08 * i, ease: [0.22, 1, 0.36, 1] as const } }),
+  hidden: { opacity: 0, y: 16 },
+  show: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.55, delay: 0.07 * i, ease: [0.22, 1, 0.36, 1] as const } }),
 };
 
 export default function Hero({ samples, text, fileName, busy, error, use3D, onGiveUp3D, onText, onPick, onAnalyze }: HeroProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [tooBig, setTooBig] = useState(false);
 
   async function readFile(file: File | undefined) {
     if (!file) return;
     if (file.size > 400_000) {
-      onText("", null);
+      setTooBig(true);
       return;
     }
+    setTooBig(false);
     onText(await file.text(), file.name);
   }
 
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
 
   return (
-    <section className="relative isolate overflow-hidden">
-      {/* Background: static gradient first, WebGL on top once it is allowed and loaded. */}
+    <section id="top" className="relative isolate overflow-hidden">
       <div className="hero-static absolute inset-0 -z-20" aria-hidden="true" />
       {use3D && (
         <div className="absolute inset-0 -z-10">
@@ -58,50 +65,46 @@ export default function Hero({ samples, text, fileName, busy, error, use3D, onGi
       )}
       <div className="hero-fade pointer-events-none absolute inset-0 -z-10" aria-hidden="true" />
 
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 pt-14 pb-16 sm:px-8 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-12 lg:pt-24 lg:pb-24">
-        <div>
-          <motion.p custom={0} variants={fadeUp} initial="hidden" animate="show" className="inline-flex items-center gap-2 rounded-full border border-teal-300/35 bg-teal-400/10 px-3.5 py-1.5 text-sm font-medium text-teal-100">
-            <span className="h-2 w-2 rounded-full bg-teal-300" aria-hidden="true" />
-            Tech Fusion &apos;26 · Medical Lab Report Explainer
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 pt-10 pb-14 sm:px-8 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:items-start lg:gap-14 lg:pt-16 lg:pb-20">
+        <div className="lg:pt-6">
+          <motion.p custom={0} variants={fadeUp} initial="hidden" animate="show" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-bold tracking-[0.16em] text-ink uppercase">
+            <span className="h-2.5 w-2.5 rounded-full bg-forest" aria-hidden="true" />
+            For CityLab reports · English and Roman Urdu
           </motion.p>
 
-          <motion.h1 custom={1} variants={fadeUp} initial="hidden" animate="show" className="font-display mt-5 text-4xl leading-[1.08] font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Your lab report,
+          <motion.h1 custom={1} variants={fadeUp} initial="hidden" animate="show" className="font-display mt-6 text-[3.4rem] leading-[0.98] font-semibold tracking-tight text-ink sm:text-7xl lg:text-[5.2rem]">
+            Got a lab report you can&apos;t read?
             <br />
-            in words you <span className="text-teal-300">actually understand.</span>
+            <span className="text-brand">Samjho.</span>
           </motion.h1>
 
-          <motion.p custom={2} variants={fadeUp} initial="hidden" animate="show" className="mt-5 max-w-xl text-lg leading-relaxed text-slate-200">
-            LabSaathi checks every value against the lab&apos;s own reference sheets, shows its working, and explains the result in plain English or Roman Urdu. It never guesses and it never diagnoses.
+          <motion.p custom={2} variants={fadeUp} initial="hidden" animate="show" className="mt-6 max-w-xl text-xl leading-relaxed text-ink/80">
+            Paste your report. We check every number against the lab&apos;s own range sheets, tell you what is normal and what is not, and give you questions to take to your doctor.
           </motion.p>
 
-          <motion.ul custom={3} variants={fadeUp} initial="hidden" animate="show" className="mt-7 grid max-w-xl gap-3 text-[0.95rem] text-slate-200 sm:grid-cols-2">
-            {[
-              ["Rules decide, not AI", "Normal, high, low and urgent come from a tested rules engine."],
-              ["Every result cites its file", "Open any card to see the range, the file and the line."],
-              ["Asks instead of guessing", "Missing age or sex? It asks. It never reads sex from a name."],
-              ["Locked to one patient", "The chat cannot be talked into another person's report."],
-            ].map(([title, body]) => (
-              <li key={title} className="glass rounded-2xl px-4 py-3">
-                <p className="font-semibold text-white">{title}</p>
-                <p className="mt-0.5 text-sm leading-snug text-slate-300">{body}</p>
-              </li>
-            ))}
-          </motion.ul>
+          <motion.a custom={3} variants={fadeUp} initial="hidden" animate="show" href="#story" className="mt-9 hidden items-center gap-4 lg:inline-flex">
+            <span className="flex h-16 w-10 items-start justify-center rounded-full border-2 border-ink bg-white pt-2.5" aria-hidden="true">
+              <motion.span className="h-2.5 w-1.5 rounded-full bg-brand" animate={{ y: [0, 14, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} />
+            </span>
+            <span>
+              <span className="font-display block text-2xl font-semibold text-ink">Or scroll for the story</span>
+              <span className="block text-sm font-medium text-muted">Why a report needs explaining at all.</span>
+            </span>
+          </motion.a>
         </div>
 
-        <motion.div custom={2} variants={fadeUp} initial="hidden" animate="show" className="glass-strong rounded-3xl p-5 sm:p-6">
+        <motion.div custom={2} variants={fadeUp} initial="hidden" animate="show" className="card-strong rounded-3xl p-5 sm:p-6">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-display text-lg font-semibold text-white">Add a report</h2>
+            <h2 className="font-display text-3xl font-semibold text-ink">Your report</h2>
             <button
               type="button"
               onClick={() => fileInput.current?.click()}
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3.5 py-1.5 text-sm font-medium text-white transition hover:border-teal-300/60 hover:bg-teal-400/10"
+              className="inline-flex items-center gap-2 rounded-full border border-ink/25 bg-white px-3.5 py-1.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand"
             >
               <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                <path d="M10 13V3m0 0L6.5 6.5M10 3l3.5 3.5M3.5 13.5v2a1.5 1.5 0 001.5 1.5h10a1.5 1.5 0 001.5-1.5v-2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M10 13V3m0 0L6.500 6.500M10 3l3.500 3.500M3.500 13.500v2a1.500 1.500 0 001.500 1.500h10a1.500 1.500 0 001.500-1.500v-2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              Upload .md or .txt
+              Upload file
             </button>
             <input ref={fileInput} type="file" accept=".md,.txt,.markdown,text/plain,text/markdown" className="sr-only" onChange={(e) => readFile(e.target.files?.[0])} />
           </div>
@@ -120,28 +123,50 @@ export default function Hero({ samples, text, fileName, busy, error, use3D, onGi
               setDragging(false);
               readFile(e.dataTransfer.files?.[0]);
             }}
-            className={`mt-4 rounded-2xl border transition ${dragging ? "border-teal-300 bg-teal-400/10" : "border-white/15 bg-black/25"}`}
+            className={`mt-4 rounded-2xl border transition ${dragging ? "border-brand bg-brand/5" : "border-ink/20 bg-cream/50"}`}
           >
             <textarea
               id="report"
               value={text}
               onChange={(e) => onText(e.target.value, null)}
-              rows={7}
+              rows={6}
               spellCheck={false}
-              placeholder={"Paste the report text here, drop a file, or pick a sample below.\n\nExample:\nPatient Name: ...\nAge: 42   Sex: Female\n- Hemoglobin: 6.5 g/dL"}
-              className="thin-scroll block h-44 w-full resize-none rounded-2xl bg-transparent p-4 font-mono text-[0.82rem] leading-relaxed text-slate-100 placeholder:text-slate-400 focus:outline-none"
+              placeholder={"Paste the report here, or drop a .md / .txt file.\n\nPatient Name: ...\nAge: 42    Sex: Female\n- Hemoglobin: 6.5 g/dL"}
+              className="thin-scroll block h-40 w-full resize-none rounded-2xl bg-transparent p-4 font-mono text-[0.82rem] leading-relaxed text-ink placeholder:text-muted focus:outline-none"
             />
-            <div className="flex items-center justify-between gap-3 border-t border-white/10 px-4 py-2 text-xs text-slate-300">
+            <div className="flex items-center justify-between gap-3 border-t border-ink/10 px-4 py-2 text-xs text-muted">
               <span className="truncate">{fileName ? fileName : "Pasted text"}</span>
               <span className="shrink-0 tabular-nums">{words.toLocaleString()} words</span>
             </div>
           </div>
+          {tooBig && <p className="mt-2 text-sm text-urgent">That file is too large. Reports are text files of a few pages.</p>}
 
-          <div className="mt-4">
-            <p className="text-sm font-medium text-slate-200">Or try one of the 14 sample reports</p>
-            <div className="thin-scroll mt-2 flex max-h-32 flex-wrap gap-2 overflow-y-auto pr-1">
-              {samples.length === 0 &&
-                Array.from({ length: 8 }, (_, i) => <span key={i} className="skeleton h-8 w-28 rounded-full" aria-hidden="true" />)}
+          <button
+            type="button"
+            onClick={onAnalyze}
+            disabled={busy || !text.trim()}
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-5 py-3.5 text-lg font-semibold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            {busy ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
+                Reading it against the lab&apos;s sheets
+              </>
+            ) : (
+              "Explain my report"
+            )}
+          </button>
+
+          {error && (
+            <p role="alert" className="mt-4 rounded-xl border border-urgent/40 bg-urgent/10 px-4 py-3 text-sm text-urgent">
+              {error}
+            </p>
+          )}
+
+          <div className="mt-6 border-t border-ink/10 pt-4">
+            <p className="text-sm font-semibold text-ink">No report on you? Try one of the lab&apos;s 14 samples</p>
+            <div className="thin-scroll mt-2.5 flex max-h-28 flex-wrap gap-2 overflow-y-auto pr-1">
+              {samples.length === 0 && Array.from({ length: 8 }, (_, i) => <span key={i} className="skeleton h-8 w-28 rounded-full" aria-hidden="true" />)}
               {samples.map((s) => (
                 <button
                   key={s.id}
@@ -156,45 +181,26 @@ export default function Hero({ samples, text, fileName, busy, error, use3D, onGi
                     }
                   }}
                   title={`${s.file}\nTests: ${s.tests.join(", ")}`}
-                  className={`rounded-full border px-3 py-1.5 text-left text-sm transition disabled:opacity-60 ${
-                    fileName === s.file ? "border-teal-300 bg-teal-400/15 text-white" : "border-white/15 bg-white/5 text-slate-100 hover:border-teal-300/60 hover:bg-teal-400/10"
+                  className={`rounded-full border px-3 py-1.5 text-left text-sm font-medium transition disabled:opacity-60 ${
+                    fileName === s.file ? "border-ink bg-ink text-white" : "border-ink/20 bg-white text-ink hover:border-brand hover:text-brand"
                   }`}
                 >
-                  <span className="font-mono text-xs text-teal-200">{s.id}</span> {loadingId === s.id ? "Loading..." : s.label}
+                  {loadingId === s.id ? "Loading..." : s.label}
                 </button>
               ))}
             </div>
-          </div>
-
-          {error && (
-            <p role="alert" className="mt-4 rounded-xl border border-red-300/50 bg-red-500/15 px-4 py-3 text-sm text-red-50">
-              {error}
+            <p className="mt-3 text-sm text-muted">
+              Demo files to download:{" "}
+              {DEMO_FILES.map((d, i) => (
+                <span key={d.file}>
+                  <a href={`/demo/${d.file}`} download className="font-semibold text-ink underline decoration-brand decoration-2 underline-offset-2 hover:text-brand">
+                    {d.label.split(":")[0]}
+                  </a>
+                  {i < DEMO_FILES.length - 1 ? ", " : "."}
+                </span>
+              ))}
             </p>
-          )}
-
-          <button
-            type="button"
-            onClick={onAnalyze}
-            disabled={busy || !text.trim()}
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-300 px-5 py-3.5 text-base font-semibold text-slate-950 shadow-[0_10px_40px_-10px_rgba(45,212,191,0.7)] transition hover:bg-teal-200 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {busy ? (
-              <>
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/30 border-t-slate-900" aria-hidden="true" />
-                Checking against the lab&apos;s sheets...
-              </>
-            ) : (
-              <>
-                Explain this report
-                <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
-                  <path d="M4 10h12m0 0l-4.5-4.5M16 10l-4.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </>
-            )}
-          </button>
-          <p className="mt-3 text-center text-xs leading-relaxed text-slate-300">
-            Only the lab&apos;s own files are used as the knowledge source. Your name and MRN are never sent to the language model.
-          </p>
+          </div>
         </motion.div>
       </div>
     </section>

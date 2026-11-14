@@ -104,15 +104,15 @@ function Tube({ level, color, urgent, showMarks }: TubeProps) {
       {/* glass */}
       <mesh position={[0, 0.03, 0]}>
         <cylinderGeometry args={[TUBE_R, TUBE_R, TUBE_H, 40, 1, true]} />
-        <meshPhysicalMaterial color="#cfe9ff" transparent opacity={0.16} roughness={0.05} metalness={0.1} clearcoat={1} side={THREE.DoubleSide} depthWrite={false} />
+        <meshPhysicalMaterial color="#5b6770" transparent opacity={0.2} roughness={0.05} metalness={0.1} clearcoat={1} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
       <mesh position={[0, base + 0.03, 0]} rotation={[Math.PI, 0, 0]}>
         <sphereGeometry args={[TUBE_R, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshPhysicalMaterial color="#cfe9ff" transparent opacity={0.16} roughness={0.05} clearcoat={1} side={THREE.DoubleSide} depthWrite={false} />
+        <meshPhysicalMaterial color="#5b6770" transparent opacity={0.2} roughness={0.05} clearcoat={1} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
       <mesh position={[0, TUBE_H / 2 + 0.03, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[TUBE_R + 0.02, 0.045, 12, 48]} />
-        <meshStandardMaterial color="#e6f4ff" transparent opacity={0.55} roughness={0.1} />
+        <meshStandardMaterial color="#4a545c" transparent opacity={0.7} roughness={0.2} />
       </mesh>
 
       {/* range limits */}
@@ -120,7 +120,7 @@ function Tube({ level, color, urgent, showMarks }: TubeProps) {
         [0.25, 0.75].map((p) => (
           <mesh key={p} position={[0, markY(p), 0]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[TUBE_R + 0.015, 0.014, 8, 48]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.75} />
+            <meshBasicMaterial color="#16130f" transparent opacity={0.8} />
           </mesh>
         ))}
     </group>
@@ -148,9 +148,9 @@ export default function TubeScene(props: TubeProps) {
         gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
         onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       >
-        <ambientLight intensity={0.9} />
+        <ambientLight intensity={1.5} />
         <directionalLight position={[3, 4, 5]} intensity={2.2} />
-        <directionalLight position={[-4, 1, 2]} intensity={0.9} color="#2dd4bf" />
+        <directionalLight position={[-4, 1, 2]} intensity={0.9} color="#fff1e6" />
         <pointLight position={[0, -1, 2.5]} intensity={props.urgent ? 9 : 4} color={props.color} distance={8} />
         <Float speed={props.urgent ? 3.2 : 1.4} rotationIntensity={0.18} floatIntensity={0.35} floatingRange={[-0.05, 0.05]}>
           <Tube {...props} />
