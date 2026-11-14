@@ -26,7 +26,7 @@ const SCENES: Scene[] = [
   { id: "chatbot", eyebrow: "Just ask a chatbot?", title: <>It answers. Confidently.</>, body: "But it doesn't know your lab's ranges, your age or your sex. It guesses, and it sounds sure." },
   { id: "noise", eyebrow: "The data we were given", title: <>96% of every file is noise.</>, body: "Legal disclaimers, compliance logs and boilerplate. The actual results are a few lines buried inside." },
   { id: "traps", eyebrow: "And it has traps", title: <>The files don&apos;t cover everything.</>, body: "A good answer has to know where the files stop, and say so." },
-  { id: "me", eyebrow: "Who built this", title: <>I&apos;m Ahmed Malik.</>, body: "Solo developer. One person, one day, one rule: a medical answer must be right or it must ask." },
+  { id: "me", eyebrow: "Who built this", title: <>I&apos;m Ahmed Malik.</>, body: "I built this solo, with one rule: a medical answer must be right, or it must ask." },
   { id: "idea", eyebrow: "The idea", title: <>Rules decide. AI explains.</>, body: "No language model is allowed to decide if a result is normal, high or urgent. Tested code does that, using the lab's own sheets. The AI only puts it into plain words." },
   { id: "guard", eyebrow: "And we check the AI", title: <>Its words are checked before you see them.</>, body: "A new number, or anything that sounds like a diagnosis, is thrown out. It gets one retry, then a safe built-in answer." },
   { id: "demo", eyebrow: "Enough talking", title: <>Let me show you.</>, body: "Everything below is the live product." },
@@ -370,6 +370,29 @@ function SceneBlock({ scene, index, use3D, onStart }: { scene: Scene; index: num
                 </span>
                 or scroll for the story
               </span>
+            </div>
+          )}
+          {scene.id === "me" && (
+            <div className="mt-6 grid gap-3">
+              <p className="inline-flex w-fit items-center gap-2 rounded-full bg-ink px-4 py-2 text-base text-white">
+                <span aria-hidden="true">🏆</span>
+                <strong className="font-bold">4x National Hackathon Winner</strong>
+              </p>
+              <ul className="grid max-w-md gap-1.5 text-base text-ink/80">
+                <li>Founder and lead engineer at Wyibe</li>
+                <li>Full-stack, cloud and AI engineer</li>
+              </ul>
+              <a
+                href="https://www.linkedin.com/in/ahhmedmalik"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex w-fit items-center gap-2 rounded-full border border-ink/25 bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:-translate-y-0.5 hover:border-[#0a66c2] hover:text-[#0a66c2]"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#0a66c2]" fill="currentColor" aria-hidden="true">
+                  <path d="M4.98 3.5a2.5 2.5 0 11-.02 5 2.5 2.5 0 01.02-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.5c0-1.3-.02-3-1.83-3-1.83 0-2.1 1.43-2.1 2.9V21H9z" />
+                </svg>
+                Connect on LinkedIn
+              </a>
             </div>
           )}
           {scene.id === "demo" && (

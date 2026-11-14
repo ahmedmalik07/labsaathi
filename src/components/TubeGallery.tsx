@@ -2,15 +2,12 @@
 
 /**
  * Nine kinds of answer, nine test tubes. Every case is one the rules engine
- * really produces from the lab's files. All nine tubes share ONE WebGL canvas
- * (drei <View>), so the page never runs out of browser 3D contexts.
+ * really produces from the lab's files. Each tube only gets a live 3D canvas
+ * while it is on screen (see TubeBox), so it sits exactly in its card.
  */
-import { Float, PerspectiveCamera, View } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
 import { motion } from "framer-motion";
-import { useRef } from "react";
-import { TubeFallback } from "./TestTube";
-import { Tube } from "./three/TubeScene";
+import { Tilt } from "./Motion";
+import { TubeBox } from "./TestTube";
 
 interface Case {
   title: string;
@@ -38,11 +35,9 @@ const CASES: Case[] = [
 ];
 
 export default function TubeGallery({ use3D }: { use3D: boolean }) {
-  const container = useRef<HTMLDivElement>(null!);
-
   return (
     <section className="relative border-t border-ink/10" aria-label="Every kind of answer">
-      <div ref={container} className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+      <div className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
         <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">What the rules can say</p>
         <h2 className="font-display mt-2 max-w-3xl text-5xl leading-[1.02] font-semibold text-ink sm:text-6xl">Nine kinds of answer. One tube each.</h2>
         <p className="mt-3 max-w-2xl text-lg text-muted">The liquid shows where the value sits. The two rings are the lab&apos;s low and high limits. The colour is the verdict.</p>
@@ -55,27 +50,9 @@ export default function TubeGallery({ use3D }: { use3D: boolean }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: (i % 3) * 0.1, type: "spring", stiffness: 180, damping: 22 }}
-              className={`flex items-center gap-4 rounded-3xl border bg-white p-4 ${c.urgent ? "border-urgent" : "border-ink/15"}`}
             >
-              <div className={`relative h-40 w-20 shrink-0 ${c.urgent ? "urgent-pulse rounded-[2.5rem]" : ""}`}>
-                {use3D ? (
-                  <View className="absolute inset-0">
-                    {/* Each tube gets its own camera framed to its own box, so it sits fully inside the card. */}
-                    <PerspectiveCamera makeDefault position={[0, 0, 7.2]} fov={30} />
-                    <ambientLight intensity={1.5} />
-                    <directionalLight position={[3, 4, 5]} intensity={2.2} />
-                    <directionalLight position={[-4, 1, 2]} intensity={0.9} color="#fff1e6" />
-                    <pointLight position={[0, -1, 2.5]} intensity={c.urgent ? 9 : 4} color={c.color} distance={8} />
-                    <Float speed={c.urgent ? 3 : 1.3} rotationIntensity={0.1} floatIntensity={0.2} floatingRange={[-0.04, 0.04]}>
-                      <group position={[0, 0.05, 0]}>
-                      <Tube level={c.level} color={c.color} urgent={!!c.urgent} showMarks={c.marks} />
-                      </group>
-                    </Float>
-                  </View>
-                ) : (
-                  <TubeFallback level={c.level} color={c.color} urgent={!!c.urgent} showMarks={c.marks} />
-                )}
-              </div>
+              <Tilt className={`flex h-full items-center gap-4 rounded-3xl border bg-white p-4 transition-shadow hover:shadow-[6px_8px_0_rgba(22,19,15,0.12)] ${c.urgent ? "border-urgent" : "border-ink/15"}`}>
+              <TubeBox level={c.level} color={c.color} urgent={!!c.urgent} showMarks={c.marks} use3D={use3D} className="h-40 w-20" />
               <div className="min-w-0">
                 <p className="text-xs font-bold tracking-[0.16em] text-muted uppercase">{c.title}</p>
                 <p className="font-display mt-1 text-2xl leading-tight font-semibold text-ink">{c.test}</p>
@@ -83,23 +60,11 @@ export default function TubeGallery({ use3D }: { use3D: boolean }) {
                 <span className={`mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${c.pill}`}>{c.verdict}</span>
                 <p className="mt-1.5 text-sm leading-snug text-muted">{c.why}</p>
               </div>
+              </Tilt>
             </motion.li>
           ))}
         </ul>
 
-        {use3D && (
-          <Canvas
-            eventSource={container}
-            className="pointer-events-none"
-            style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
-            camera={{ position: [0, 0.15, 5.6], fov: 34 }}
-            dpr={[1, 1.75]}
-            gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-            onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-          >
-            <View.Port />
-          </Canvas>
-        )}
       </div>
     </section>
   );

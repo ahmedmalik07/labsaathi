@@ -15,6 +15,7 @@ import ResultCard from "./ResultCard";
 import { STEP_LABEL } from "./status";
 import ScrollStory from "./ScrollStory";
 import { useSharedReport } from "./useSharedReport";
+import Toolbox from "./Toolbox";
 import { useThreeD } from "./useThreeD";
 
 /** WebGL contexts are limited per page, so only the first cards get a 3D tube. */
@@ -157,22 +158,23 @@ export default function SamjhoApp({ mode = "full" }: { mode?: "full" | "test" })
           <Link href="/" aria-label="Samjho home">
             <Logo />
           </Link>
-          <nav className="flex items-center gap-2 text-sm font-semibold">
+          <nav className="flex items-center gap-1.5 text-sm font-semibold sm:gap-2">
             <div className="flex rounded-full bg-white p-1" role="group" aria-label="Explanation language">
               {(
                 [
-                  ["en", "English"],
-                  ["roman-urdu", "Roman Urdu"],
+                  ["en", "English", "EN"],
+                  ["roman-urdu", "Roman Urdu", "Urdu"],
                 ] as const
-              ).map(([id, label]) => (
+              ).map(([id, label, short]) => (
                 <button
                   key={id}
                   type="button"
                   aria-pressed={lang === id}
                   onClick={() => switchLang(id)}
-                  className={`rounded-full px-3 py-1.5 whitespace-nowrap transition ${lang === id ? "bg-ink text-white" : "text-ink hover:bg-ink/5"}`}
+                  className={`rounded-full px-2.5 py-1.5 whitespace-nowrap transition sm:px-3 ${lang === id ? "bg-ink text-white" : "text-ink hover:bg-ink/5"}`}
                 >
-                  {label}
+                  <span className="hidden sm:inline">{label}</span>
+                  <span className="sm:hidden">{short}</span>
                 </button>
               ))}
             </div>
@@ -180,12 +182,12 @@ export default function SamjhoApp({ mode = "full" }: { mode?: "full" | "test" })
               How we tested
             </Link>
             {test ? (
-              <Link href="/" className="rounded-full bg-white px-4 py-2.5 whitespace-nowrap text-ink transition hover:text-brand">
+              <Link href="/" className="rounded-full bg-white px-3.5 py-2.5 whitespace-nowrap text-ink transition hover:text-brand sm:px-4">
                 Full story
               </Link>
             ) : (
-              <Link href="/test" className="rounded-full bg-brand px-4 py-2.5 whitespace-nowrap text-white transition hover:bg-brand-dark">
-                Test mode
+              <Link href="/test" className="rounded-full bg-brand px-3.5 py-2.5 whitespace-nowrap text-white transition hover:bg-brand-dark sm:px-4">
+                Tools
               </Link>
             )}
           </nav>
@@ -355,6 +357,8 @@ export default function SamjhoApp({ mode = "full" }: { mode?: "full" | "test" })
           </AnimatePresence>
         </div>
 
+
+        {test && <Toolbox use3D={threeD.enabled} />}
 
         <Profiles />
 

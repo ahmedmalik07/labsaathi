@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 
 /** SVG tube: first paint, reduced motion, weak devices, and cards beyond the 3D budget. */
 export function TubeFallback({ level, color, urgent, showMarks }: { level: number; color: string; urgent: boolean; showMarks: boolean }) {
@@ -50,24 +51,43 @@ export interface TestTubeProps {
   use3D: boolean;
 }
 
-export default function TestTube({ position, color, urgent, use3D }: TestTubeProps) {
-  const level = position ?? 0.5;
-  const showMarks = position !== null;
+/**
+ * Mounts the WebGL tube only while it is on or near the screen, and drops it
+ * again when it scrolls away. The SVG tube shows in the meantime. This keeps the
+ * number of live 3D canvases small, so browsers never run out of them, and each
+ * canvas is exactly the size of its own box, so the tube sits where it should.
+ */
+function useNearScreen<T extends Element>() {
+  const ref = useRef<T>(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { rootMargin: "150px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return [ref, near] as const;
+}
+
+export function TubeBox({ level, color, urgent, showMarks, use3D, className }: { level: number; color: string; urgent: boolean; showMarks: boolean; use3D: boolean; className: string }) {
+  const [ref, near] = useNearScreen<HTMLDivElement>();
   return (
-    <div className={`relative h-44 w-20 shrink-0 sm:h-48 sm:w-24 ${urgent ? "urgent-pulse rounded-[2.75rem]" : ""}`}>
-      {use3D ? (
-        <>
-          {/* The SVG sits underneath until the WebGL canvas has painted over it. */}
-          <div className="absolute inset-0 opacity-0">
-            <TubeFallback level={level} color={color} urgent={urgent} showMarks={showMarks} />
-          </div>
-          <div className="absolute inset-0">
-            <TubeScene level={level} color={color} urgent={urgent} showMarks={showMarks} />
-          </div>
-        </>
-      ) : (
+    <div ref={ref} className={`relative shrink-0 ${className} ${urgent ? "urgent-pulse rounded-[2.75rem]" : ""}`}>
+      <div className={`absolute inset-0 transition-opacity duration-500 ${use3D && near ? "opacity-0" : "opacity-100"}`}>
         <TubeFallback level={level} color={color} urgent={urgent} showMarks={showMarks} />
+      </div>
+      {use3D && near && (
+        <div className="absolute inset-0">
+          <TubeScene level={level} color={color} urgent={urgent} showMarks={showMarks} />
+        </div>
       )}
     </div>
   );
+}
+
+export default function TestTube({ position, color, urgent, use3D }: TestTubeProps) {
+  const level = position ?? 0.5;
+  const showMarks = position !== null;
+  return <TubeBox level={level} color={color} urgent={urgent} showMarks={showMarks} use3D={use3D} className="h-44 w-20 sm:h-48 sm:w-24" />;
 }

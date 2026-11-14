@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import SamjhoApp from "@/components/SamjhoApp";
 
 export const metadata: Metadata = {
-  title: "Samjho · test mode",
+  title: "Samjho · tools",
   description: "Just the tool: paste or upload a lab report and see every result, with no story in front.",
 };
 

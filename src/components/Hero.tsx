@@ -96,8 +96,9 @@ export default function Hero({ samples, text, fileName, busy, error, onText, onP
       <div className={compact ? "mx-auto w-full max-w-3xl px-5 pt-24 pb-10 sm:px-8" : "mx-auto grid w-full max-w-6xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[0.9fr_1fr] lg:items-start lg:gap-14 lg:py-20"}>
         {compact ? (
           <div className="mb-5">
-            <p className="text-xs font-bold tracking-[0.2em] text-brand uppercase">Test mode</p>
+            <p className="text-xs font-bold tracking-[0.2em] text-brand uppercase">Tools</p>
             <h1 className="font-display mt-1 text-4xl leading-tight font-semibold text-ink">Paste a report, upload one, or pick a sample.</h1>
+            <p className="mt-2 text-muted">Only have one number? <a href="#tools" className="font-semibold text-ink underline decoration-brand decoration-2 underline-offset-2">Use the quick tools below</a>.</p>
           </div>
         ) : (
         <div className="lg:pt-4">

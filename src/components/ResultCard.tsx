@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useId, useState } from "react";
 import type { TestResult } from "@/lib/types";
 import { STATUS, STEP_LABEL } from "./status";
+import { CountUp, Tilt } from "./Motion";
 import TestIcon from "./TestIcon";
 import TestTube from "./TestTube";
 
@@ -45,6 +46,7 @@ export default function ResultCard({ result, index, use3D }: { result: TestResul
   const range = rangeText(result);
 
   return (
+    <Tilt max={3}>
     <motion.article
       layout="position"
       initial={{ opacity: 0, y: 22 }}
@@ -76,7 +78,7 @@ export default function ResultCard({ result, index, use3D }: { result: TestResul
           </div>
 
           <p className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span className="text-4xl font-bold text-ink tabular-nums">{result.rawValue}</span>
+            <CountUp value={result.rawValue} className="text-4xl font-bold text-ink tabular-nums" />
             {result.unit && <span className="text-base text-muted">{result.unit}</span>}
             {result.conversion && (
               <span className="rounded-full bg-ink px-2.5 py-0.5 text-sm font-medium text-white">
@@ -172,5 +174,6 @@ export default function ResultCard({ result, index, use3D }: { result: TestResul
         )}
       </AnimatePresence>
     </motion.article>
+    </Tilt>
   );
 }

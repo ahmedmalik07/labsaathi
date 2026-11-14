@@ -144,7 +144,7 @@ export default function TubeScene(props: TubeProps) {
       <Canvas
         frameloop={inView ? "always" : "never"}
         dpr={[1, 1.75]}
-        camera={{ position: [0, 0.15, 5.6], fov: 34 }}
+        camera={{ position: [0, 0.05, 6.6], fov: 32 }}
         gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
         onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       >

@@ -61,7 +61,12 @@ export default function Closing({ use3D }: { use3D: boolean }) {
             <p className="font-display mt-8 text-4xl leading-tight font-semibold text-ink">
               Samjho turns medical data into <span className="text-brand">medical understanding.</span>
             </p>
-            <p className="mt-6 text-lg font-semibold text-ink">Ahmed Malik · solo developer · Tech Fusion &apos;26</p>
+            <p className="mt-6 text-lg text-ink">
+              Ahmed Malik · <strong className="font-bold">4x National Hackathon Winner</strong> · solo developer, Tech Fusion &apos;26 ·{" "}
+              <a href="https://www.linkedin.com/in/ahhmedmalik" target="_blank" rel="noreferrer" className="font-semibold text-[#0a66c2] underline underline-offset-4">
+                LinkedIn
+              </a>
+            </p>
           </div>
           <div className="relative mx-auto h-80 w-48 sm:h-96 sm:w-56">
             {use3D ? <TubeScene level={0.9} color="#f59e0b" urgent={false} showMarks /> : <TubeFallback level={0.9} color="#f59e0b" urgent={false} showMarks />}
