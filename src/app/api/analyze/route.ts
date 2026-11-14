@@ -9,7 +9,7 @@ export const maxDuration = 30;
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
@@ -40,6 +40,35 @@ const Body = z.object({
   lang: z.enum(["en", "roman-urdu"]).nullish(),
   explain: z.boolean().nullish(),
 });
+
+/** A GET explains how to call the endpoint instead of returning a bare 405. */
+export async function GET() {
+  return NextResponse.json(
+    {
+      endpoint: "POST /api/analyze",
+      contentType: "application/json (a text/plain or text/markdown body is also accepted as the report itself)",
+      request: {
+        reportText: "string, required: the lab report as text",
+        age: "number or string, optional: used only when the report does not give an age",
+        sex: '"male" | "female", optional: used only when the report does not give a sex',
+        lang: '"en" | "roman-urdu", optional, default "en"',
+        explain: "boolean, optional, default true. false skips the language model and returns the template explanation",
+      },
+      response: {
+        patient: "{ name, age, sex, mrn, missing[] }",
+        results: "[{ canonicalName, originalName, value, unit, convertedValue, rangeUsed, status, direction, urgent, question, summary, trace[] }]",
+        status: "normal | low | high | abnormal | urgent | needs_info | unclassified",
+        urgent: "boolean",
+        needsInfo: "[{ field, question, blocking[] }]",
+        explanation: "string: engine verdict lines, plain-language text, doctor questions, doctor disclaimer",
+        doctorQuestions: "string[]",
+        trace: "[{ step, detail, source? }]",
+        sessionId: "signed token for POST /api/chat",
+      },
+    },
+    { headers: CORS },
+  );
+}
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS });
