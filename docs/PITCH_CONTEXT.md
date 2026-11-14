@@ -74,6 +74,9 @@ Eight steps. Say them as a pipeline.
 | **"How we got this" on every card** | Shows the alias match, the unit conversion, the range and the exact file and line. The user and the judge can check the work. |
 | **3D test tubes** | The liquid level shows where your value sits in the range. Two rings mark the low and high limits. Colour is the status. Urgent tubes pulse. |
 | **Asks instead of guessing** | Missing age or sex shows a small form. It never reads sex from a name (sample P002 is "Bob Jones", Female, on purpose). |
+| **Photo of a report** | Upload a picture. The text is read on the device (Tesseract OCR), shown for the user to check, then goes through the same rules. The image is never uploaded. |
+| **Profiles ("Your people")** | Each report is filed under the person it belongs to. If the report has no name, Samjho asks whose it is. One family, many profiles, all stored on the device. |
+| **Scroll story** | The site opens with a pinned, scroll-driven scene: the slip gets question marks, gets buried in scary search results, is scanned line by line, then becomes a 3D rack of filling tubes. |
 | **Personal history** | The same patient's next report shows what changed: "Hemoglobin 6.8 → 9.4, Urgent → Low". Stored only in the browser, under that patient's own MRN. |
 | **Roman Urdu** | One tap re-explains everything the way people here actually text. Read-aloud too. |
 | **Doctor sheet** | A printable page with the results table and questions, with lines for notes. |
@@ -156,7 +159,7 @@ Backup if the internet is slow: the sample buttons (Diana Prince for urgent, Lau
 7. **Trust features.** Trace with file citations, asks instead of guessing, privacy lock, honest "cannot classify".
 8. **Proof.** 267 tests, 14 of 14 samples, 60 of 60 live, 0.3 to 2.4 ms, $0.
 9. **Honest limits.** Three or four from section 10 below. Judges respect this.
-10. **What is next + thank you.** OCR for photos of reports, more labs' range sheets, Urdu script, a doctor-facing view.
+10. **What is next + thank you.** PDF upload and sturdier OCR, more labs' range sheets, Urdu script, a doctor-facing view.
 
 ---
 
@@ -181,7 +184,7 @@ Do not quote a paid-tier price: we did not verify one.
 2. **"Hit or pass" versus "Less than".** The urgent file contradicts itself. We treat a value equal to the threshold as urgent. It is one line to flip.
 3. **Urine names are matched by context.** "pH Level" becomes "Urine pH" only when the report is clearly a urine report. A strict mode switch turns this off.
 4. **Ages outside 18 to 100** get "cannot be classified", because the lab's sheets stop there.
-5. **No photos or handwriting.** Text only for now.
+5. **Photos work, with OCR limits.** In our test the OCR read the values right but misread the unit `mIU/L` as `mU/L`, so that one test came back "cannot be classified" until corrected. Handwriting and blurry photos are not expected to work.
 6. **Roman Urdu wording is the model's.** It can make a small factual slip. The guard checks numbers and diagnosis wording, not general accuracy.
 7. **History lives in one browser.** Clear the browser and it is gone. That is a privacy choice, not a database.
 
@@ -203,7 +206,7 @@ Do not quote a paid-tier price: we did not verify one.
 
 **"Where does the history go?"** Nowhere. It is in the browser's local storage under that patient's MRN, with a "forget" button.
 
-**"What would you do with more time?"** OCR for photographed reports, range sheets from more labs, Urdu script, and trend alerts across more than two reports.
+**"What would you do with more time?"** better OCR with a unit-repair step, range sheets from more labs, Urdu script, and trend alerts across more than two reports.
 
 ---
 

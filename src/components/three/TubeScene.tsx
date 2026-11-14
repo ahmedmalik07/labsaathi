@@ -48,7 +48,7 @@ function Bubbles({ color, top }: { color: string; top: number }) {
   );
 }
 
-function Tube({ level, color, urgent, showMarks }: TubeProps) {
+export function Tube({ level, color, urgent, showMarks }: TubeProps) {
   const liquid = useRef<THREE.Mesh>(null);
   const cap = useRef<THREE.Mesh>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);

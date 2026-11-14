@@ -7,12 +7,12 @@ import type { AnalyzeResponse } from "@/lib/pipeline";
 import type { Explanation } from "@/lib/types";
 import ExplainTabs, { type Lang } from "./ExplainTabs";
 import Hero, { type SampleInfo } from "./Hero";
-import History from "./History";
+import History, { Profiles } from "./History";
 import Logo from "./Logo";
 import NeedsInfoForm from "./NeedsInfoForm";
 import ResultCard from "./ResultCard";
 import { STEP_LABEL } from "./status";
-import Story from "./Story";
+import ScrollStory from "./ScrollStory";
 import { useThreeD } from "./useThreeD";
 
 /** WebGL contexts are limited per page, so only the first cards get a 3D tube. */
@@ -130,7 +130,7 @@ export default function SamjhoApp() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="no-print sticky top-0 z-40 border-b border-ink/10 bg-cream/90 backdrop-blur">
+      <header className="no-print fixed inset-x-0 top-0 z-40 border-b border-ink/10 bg-cream/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
           <Link href="/" aria-label="Samjho home">
             <Logo />
@@ -154,22 +154,25 @@ export default function SamjhoApp() {
                 </button>
               ))}
             </div>
-            <Link href="/evals" className="hidden rounded-full bg-white px-4 py-2.5 text-ink transition hover:text-brand sm:inline-block">
+            <Link href="/evals" className="hidden rounded-full bg-white px-4 py-2.5 text-ink transition hover:text-brand md:inline-block">
               Test results
             </Link>
+            <a href="#top" className="rounded-full bg-brand px-4 py-2.5 whitespace-nowrap text-white transition hover:bg-brand-dark">
+              My report
+            </a>
           </nav>
         </div>
       </header>
 
       <main className="flex-1">
+        <ScrollStory use3D={threeD.enabled} onGiveUp3D={threeD.disable} onStart={() => document.getElementById("top")?.scrollIntoView({ behavior: "smooth" })} />
+
         <Hero
           samples={samples}
           text={text}
           fileName={fileName}
           busy={busy}
           error={error}
-          use3D={threeD.enabled}
-          onGiveUp3D={threeD.disable}
           onText={(t, name) => {
             setText(t);
             setFileName(name);
@@ -322,9 +325,8 @@ export default function SamjhoApp() {
           </AnimatePresence>
         </div>
 
-        <div id="story" className="scroll-mt-16">
-          <Story onStart={() => document.getElementById("top")?.scrollIntoView({ behavior: "smooth" })} />
-        </div>
+
+        <Profiles />
       </main>
 
       <footer className="no-print border-t border-ink/10 bg-ink text-white">

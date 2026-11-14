@@ -82,6 +82,24 @@ export default function ResultCard({ result, index, use3D }: { result: TestResul
           </p>
 
           <p className="mt-2 text-[0.95rem] leading-relaxed text-ink/85">{verdictLine(result)}</p>
+          {result.position !== null && result.rangeUsed && result.rangeUsed.low !== null && result.rangeUsed.high !== null && (
+            <div className="mt-3 max-w-xs" aria-hidden="true">
+              <div className="relative h-2.5 rounded-full bg-cream-deep">
+                <div className="absolute inset-y-0 left-1/4 w-1/2 rounded-full bg-forest/30" />
+                <motion.div
+                  className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white shadow"
+                  style={{ background: meta.color }}
+                  initial={{ left: "0%" }}
+                  animate={{ left: `${result.position * 100}%` }}
+                  transition={{ type: "spring", stiffness: 90, damping: 16, delay: 0.25 + Math.min(index * 0.07, 0.5) }}
+                />
+              </div>
+              <div className="relative mt-1 h-4 text-[0.7rem] font-medium text-muted tabular-nums">
+                <span className="absolute left-1/4 -translate-x-1/2">{result.rangeUsed.low}</span>
+                <span className="absolute left-3/4 -translate-x-1/2">{result.rangeUsed.high}</span>
+              </div>
+            </div>
+          )}
           {range && <p className="mt-1 text-sm text-muted">{range}</p>}
           {result.rangeUsed && (
             <p className="mt-1 text-xs text-muted">
