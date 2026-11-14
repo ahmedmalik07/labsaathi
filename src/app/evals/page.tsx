@@ -21,6 +21,71 @@ interface Health {
   knowledgeBase: { files: number; boilerplateRemovedPct: number; aliases: number; ranges: number; urgentThresholds: number; rules: number };
 }
 
+const GROUPS: Record<string, { title: string; about: string }> = {
+  "sample reports": { title: "The 14 reports the organisers gave us", about: "Every sample report, read from the original file, with the answer the brief says is right." },
+  "urgent thresholds": { title: "Right on the danger limits", about: "Values exactly on, just under and past the lab's urgent limits (7.0, 300, 50,000, 1,000)." },
+  "age limits": { title: "Ages and missing details", about: "Ages 17, 18, 100 and 101, blank or unreadable ages, and a male-sounding name with no sex given." },
+  "units and names": { title: "Short forms and units", about: "Lowercase aliases, units it cannot convert, mmol/L, qualitative results, names not in the glossary." },
+  layouts: { title: "Messy report layouts", about: "Layouts the samples never used: dotted lines, '=' signs, reordered tables, one-line demographics." },
+  privacy: { title: "Asking about another patient", about: "Chat messages that try to reach someone else's report. They must be refused." },
+};
+
+/** Turns raw check values into words a person can read. */
+function plain(v: string): string {
+  let t = v.replace(/^"|"$/g, "");
+  const words: Record<string, string> = {
+    needs_info: "asks for missing details",
+    unclassified: "cannot be classified",
+    normal: "normal",
+    low: "low",
+    high: "high",
+    urgent: "urgent",
+    abnormal: "abnormal",
+    true: "yes",
+    false: "no",
+    null: "missing",
+    "[]": "nothing",
+    context: "matched by context",
+    alias: "glossary alias",
+    normalized: "matched after ignoring plurals and word order",
+    exact: "exact name",
+    none: "no match",
+  };
+  if (t in words) return words[t];
+  if (t.startsWith("[")) {
+    try {
+      const arr = JSON.parse(v) as string[];
+      return arr.length ? arr.join(" and ") : "nothing";
+    } catch {
+      /* keep as is */
+    }
+  }
+  t = t.replace(/^patient\./, "");
+  return t;
+}
+
+function plainLabel(label: string): string {
+  if (label === "number of tests found") return "Number of tests read from the report";
+  return label
+    .replace(/ status$/, ": result")
+    .replace(/ direction$/, ": low or high")
+    .replace(/ converted value$/, ": value after unit conversion")
+    .replace(/ original name$/, ": name as written on the report")
+    .replace(/ matched by$/, ": how the name was matched")
+    .replace(/ carries a question$/, ": asks the user a question")
+    .replace(/ carries the doctor warning$/, ": shows 'see a doctor today'")
+    .replace(/ trace has steps$/, ": shows its working")
+    .replace(/ found$/, ": found on the report")
+    .replace(/^patient\.name$/, "Patient name read")
+    .replace(/^patient\.age$/, "Patient age read")
+    .replace(/^patient\.sex$/, "Patient sex read")
+    .replace(/^number of tests found$/, "Number of tests read from the report")
+    .replace(/^urgent flag$/, "Urgent warning shown")
+    .replace(/^asks for$/, "Asks the user for")
+    .replace(/^chat refused$/, "Message refused")
+    .replace(/^refusal cites the safety rules file$/, "Refusal points to the lab's safety rule");
+}
+
 export default function EvalsPage() {
   const [run, setRun] = useState<EvalRun | null>(null);
   const [health, setHealth] = useState<Health | null>(null);
@@ -78,26 +143,42 @@ export default function EvalsPage() {
       </header>
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-10 sm:px-8">
-        <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">Live test results</p>
-        <h1 className="font-display mt-1 text-5xl leading-none font-semibold tracking-tight text-ink sm:text-6xl">Is the rules engine right, right now?</h1>
-        <p className="mt-3 max-w-3xl leading-relaxed text-ink/85">
-          This page runs the acceptance cases against the deployed rules engine every time it loads. The same list is the Vitest suite in the repository, which adds generated tests for every boundary of every range row. No language model is involved in any of these
-          checks.
+        <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">How we tested Samjho</p>
+        <h1 className="font-display mt-1 text-5xl leading-none font-semibold tracking-tight text-ink sm:text-6xl">Does it give the right answer?</h1>
+        <p className="mt-3 max-w-3xl text-lg leading-relaxed text-ink/85">
+          Every time you open this page, it runs {run ? run.total : "60"} reports through the same rules the app uses, and compares each answer with the answer it should give. It is a live exam, marked by code, on the real server.
         </p>
+
+        <ol className="mt-6 grid gap-3 sm:grid-cols-3">
+          {[
+            ["Feed it a report", "One of the organisers' 14, or a tricky one we wrote: a value on a danger limit, a missing age, a messy layout."],
+            ["Samjho labels it", "Normal, low, high, urgent, asks for details, or cannot be classified. Exactly what you would see in the app."],
+            ["Mark the answer", "Green if Samjho matched the correct answer on every point. Red, with what went wrong, if it did not."],
+          ].map(([t, d], i) => (
+            <li key={t} className="flex gap-3 rounded-2xl border border-ink/15 bg-white p-4">
+              <span className="font-display flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-xl font-semibold text-white">{i + 1}</span>
+              <span>
+                <span className="block font-semibold text-ink">{t}</span>
+                <span className="block text-sm leading-snug text-muted">{d}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-3 text-sm text-muted">No AI is involved in these answers, so they come out the same every time. Tap any row to see each point it was marked on.</p>
 
         <div className="mt-7 grid gap-4 sm:grid-cols-3">
           <div className={`card rounded-3xl p-5 ${run ? (allPass ? "border-forest/40" : "border-urgent/50") : ""}`}>
-            <p className="text-sm text-muted">Cases passing</p>
+            <p className="text-sm text-muted">Reports answered correctly</p>
             <p className="mt-1 text-4xl font-bold text-ink tabular-nums">{run ? `${run.passed} / ${run.total}` : loading ? "..." : "n/a"}</p>
-            {run && <p className={`mt-1 text-sm font-medium ${allPass ? "text-forest" : "text-urgent"}`}>{allPass ? "All green" : `${run.failed} failing`}</p>}
+            {run && <p className={`mt-1 text-sm font-medium ${allPass ? "text-forest" : "text-urgent"}`}>{allPass ? "Every answer correct" : `${run.failed} wrong`}</p>}
           </div>
           <div className="card rounded-3xl p-5">
-            <p className="text-sm text-muted">Engine time for the whole run</p>
+            <p className="text-sm text-muted">Time to check all of them</p>
             <p className="mt-1 text-4xl font-bold text-ink tabular-nums">{run ? `${run.ms} ms` : loading ? "..." : "n/a"}</p>
             {run && <p className="mt-1 text-sm text-muted">Ran at {new Date(run.ranAt).toLocaleTimeString()}</p>}
           </div>
           <div className="card rounded-3xl p-5">
-            <p className="text-sm text-muted">Language model</p>
+            <p className="text-sm text-muted">AI writer (only words, never verdicts)</p>
             <p className="font-display mt-1 truncate text-xl font-semibold text-ink">{health ? (health.llm.reachable ? "Reachable" : "Unavailable") : loading ? "..." : "n/a"}</p>
             {health && (
               <p className="mt-1 text-sm leading-snug text-muted">
@@ -110,7 +191,7 @@ export default function EvalsPage() {
         </div>
 
         {health && (
-          <p className="mt-4 text-sm leading-relaxed text-muted">
+          <p className="mt-4 hidden text-sm leading-relaxed text-muted">
             Knowledge base built from {health.knowledgeBase.files} files ({health.knowledgeBase.boilerplateRemovedPct}% boilerplate removed): {health.knowledgeBase.ranges} range rows, {health.knowledgeBase.aliases} aliases,{" "}
             {health.knowledgeBase.urgentThresholds} urgent thresholds, {health.knowledgeBase.rules} cited rules. Since this server instance started: {health.llm.stats.calls} model calls, {health.llm.stats.cacheHits} cache hits,{" "}
             {health.llm.stats.retries} retries, {health.llm.stats.fallbacks} fallbacks, {health.llm.stats.rateLimited} rate-limit responses.
@@ -143,37 +224,47 @@ export default function EvalsPage() {
             return (
               <section key={group} className="mt-9">
                 <div className="flex items-baseline justify-between gap-3">
-                  <h2 className="font-display text-3xl font-semibold text-ink capitalize">{group}</h2>
+                  <div>
+                    <h2 className="font-display text-3xl font-semibold text-ink">{GROUPS[group]?.title ?? group}</h2>
+                    {GROUPS[group] && <p className="mt-0.5 text-sm text-muted">{GROUPS[group].about}</p>}
+                  </div>
                   <p className={`text-sm font-medium tabular-nums ${ok === rows.length ? "text-forest" : "text-urgent"}`}>
-                    {ok} / {rows.length}
+                    {ok} of {rows.length} correct
                   </p>
                 </div>
                 <ul className="mt-3 grid gap-2">
                   {rows.map((r) => (
                     <li key={r.id} className={`card overflow-hidden rounded-2xl ${r.pass ? "" : "border-urgent/50"}`}>
                       <button type="button" onClick={() => setOpen(open === r.id ? null : r.id)} aria-expanded={open === r.id} className="flex w-full items-center gap-3 px-4 py-3 text-left">
-                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold tracking-wide ${r.pass ? "bg-forest text-white" : "bg-urgent text-white"}`}>{r.pass ? "PASS" : "FAIL"}</span>
-                        <span className="shrink-0 font-mono text-xs text-brand">{r.id}</span>
-                        <span className="min-w-0 flex-1 text-[0.95rem] text-ink/85">{r.title}</span>
-                        <span className="hidden shrink-0 text-xs text-muted tabular-nums sm:inline">{r.checks.length} checks</span>
+                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold tracking-wide ${r.pass ? "bg-forest text-white" : "bg-urgent text-white"}`}>{r.pass ? "✓ Correct" : "✗ Wrong"}</span>
+                        <span className="min-w-0 flex-1 text-[0.95rem] text-ink/85">{r.title.replace(/->/g, "→")}</span>
+                        <span className="hidden shrink-0 text-xs text-muted tabular-nums sm:inline">{r.checks.filter((c) => c.pass).length} of {r.checks.length} points</span>
                       </button>
                       <AnimatePresence initial={false}>
                         {open === r.id && (
                           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                            <ul className="grid gap-1.5 border-t border-ink/15 bg-cream-deep/60 px-4 py-3 text-sm">
-                              {r.checks.map((c, i) => (
-                                <li key={i} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                                  <span className={c.pass ? "text-forest" : "text-urgent"} aria-hidden="true">
-                                    {c.pass ? "✓" : "✗"}
-                                  </span>
-                                  <span className="text-ink/85">{c.label}</span>
-                                  <span className="font-mono text-xs text-muted">
-                                    want {c.want}
-                                    {!c.pass && <> · got {c.got}</>}
-                                  </span>
-                                </li>
-                              ))}
-                            </ul>
+                            <div className="overflow-x-auto border-t border-ink/15 bg-cream-deep/60 px-4 py-3">
+                              <table className="w-full text-left text-sm">
+                                <thead>
+                                  <tr className="text-xs tracking-wide text-muted uppercase">
+                                    <th className="py-1 pr-3 font-semibold" />
+                                    <th className="py-1 pr-3 font-semibold">What we checked</th>
+                                    <th className="py-1 pr-3 font-semibold">Correct answer</th>
+                                    <th className="py-1 font-semibold">Samjho said</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {r.checks.map((c, i) => (
+                                    <tr key={i} className="border-t border-ink/10 align-top">
+                                      <td className={`py-1.5 pr-3 font-bold ${c.pass ? "text-forest" : "text-urgent"}`}>{c.pass ? "✓" : "✗"}</td>
+                                      <td className="py-1.5 pr-3 text-ink">{plainLabel(c.label)}</td>
+                                      <td className="py-1.5 pr-3 text-ink">{plain(c.want)}</td>
+                                      <td className={`py-1.5 ${c.pass ? "text-ink" : "font-semibold text-urgent"}`}>{plain(c.got)}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -186,7 +277,7 @@ export default function EvalsPage() {
       </main>
 
       <footer className="border-t border-ink/15 bg-cream-deep/60 px-5 py-6 text-center text-sm text-muted">
-        Run the full suite locally with <code className="rounded bg-white px-1.5 py-0.5 font-mono text-xs text-ink">npm test</code>.
+        This page runs 60 of the 267 automated tests. Run all of them with <code className="rounded bg-white px-1.5 py-0.5 font-mono text-xs text-ink">npm test</code>.
       </footer>
     </div>
   );

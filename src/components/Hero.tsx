@@ -21,6 +21,8 @@ interface HeroProps {
   onAnalyze: () => void;
   /** A file shared into Samjho from another app (WhatsApp, Gallery). */
   incomingFile?: File | null;
+  /** Test mode: no intro column, the report box takes the full width. */
+  compact?: boolean;
 }
 
 export const DEMO_FILES = [
@@ -30,7 +32,7 @@ export const DEMO_FILES = [
   { file: "demo_3_sana_messy_layout.md", label: "Sana: messy layout, unknown test" },
 ];
 
-export default function Hero({ samples, text, fileName, busy, error, onText, onPick, onAnalyze, incomingFile }: HeroProps) {
+export default function Hero({ samples, text, fileName, busy, error, onText, onPick, onAnalyze, incomingFile, compact = false }: HeroProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -91,7 +93,13 @@ export default function Hero({ samples, text, fileName, busy, error, onText, onP
 
   return (
     <section id="top" className="scroll-mt-16 border-t border-ink/10 bg-cream">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[0.9fr_1fr] lg:items-start lg:gap-14 lg:py-20">
+      <div className={compact ? "mx-auto w-full max-w-3xl px-5 pt-24 pb-10 sm:px-8" : "mx-auto grid w-full max-w-6xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[0.9fr_1fr] lg:items-start lg:gap-14 lg:py-20"}>
+        {compact ? (
+          <div className="mb-5">
+            <p className="text-xs font-bold tracking-[0.2em] text-brand uppercase">Test mode</p>
+            <h1 className="font-display mt-1 text-4xl leading-tight font-semibold text-ink">Paste a report, upload one, or pick a sample.</h1>
+          </div>
+        ) : (
         <div className="lg:pt-4">
           <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-bold tracking-[0.16em] text-ink uppercase">
             <span className="h-2.5 w-2.5 rounded-full bg-forest" aria-hidden="true" />
@@ -118,6 +126,7 @@ export default function Hero({ samples, text, fileName, busy, error, onText, onP
             ))}
           </ol>
         </div>
+        )}
 
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.5 }} className="card-strong rounded-3xl p-5 sm:p-6">
           <div className="flex items-center justify-between gap-3">

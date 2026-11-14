@@ -20,7 +20,8 @@ import { useThreeD } from "./useThreeD";
 /** WebGL contexts are limited per page, so only the first cards get a 3D tube. */
 const MAX_3D_TUBES = 6;
 
-export default function SamjhoApp() {
+export default function SamjhoApp({ mode = "full" }: { mode?: "full" | "test" }) {
+  const test = mode === "test";
   const threeD = useThreeD();
   const [samples, setSamples] = useState<SampleInfo[]>([]);
   const [text, setText] = useState("");
@@ -176,17 +177,23 @@ export default function SamjhoApp() {
               ))}
             </div>
             <Link href="/evals" className="hidden rounded-full bg-white px-4 py-2.5 text-ink transition hover:text-brand md:inline-block">
-              Test results
+              How we tested
             </Link>
-            <a href="#top" className="rounded-full bg-brand px-4 py-2.5 whitespace-nowrap text-white transition hover:bg-brand-dark">
-              My report
-            </a>
+            {test ? (
+              <Link href="/" className="rounded-full bg-white px-4 py-2.5 whitespace-nowrap text-ink transition hover:text-brand">
+                Full story
+              </Link>
+            ) : (
+              <Link href="/test" className="rounded-full bg-brand px-4 py-2.5 whitespace-nowrap text-white transition hover:bg-brand-dark">
+                Test mode
+              </Link>
+            )}
           </nav>
         </div>
       </header>
 
       <main className="flex-1">
-        <ScrollStory use3D={threeD.enabled} onGiveUp3D={threeD.disable} onStart={() => document.getElementById("top")?.scrollIntoView({ behavior: "smooth" })} />
+        {!test && <ScrollStory use3D={threeD.enabled} onGiveUp3D={threeD.disable} onStart={() => document.getElementById("top")?.scrollIntoView({ behavior: "smooth" })} />}
 
         <Hero
           samples={samples}
@@ -202,6 +209,7 @@ export default function SamjhoApp() {
           onPick={pick}
           onAnalyze={() => analyze(text, fileName, {}, true)}
           incomingFile={incomingFile}
+          compact={test}
         />
 
         <div ref={resultsRef} className="scroll-mt-20">
@@ -350,7 +358,7 @@ export default function SamjhoApp() {
 
         <Profiles />
 
-        <Closing use3D={threeD.enabled} />
+        {!test && <Closing use3D={threeD.enabled} />}
       </main>
 
       <footer className="no-print border-t border-ink/10 bg-ink text-white">
@@ -358,7 +366,7 @@ export default function SamjhoApp() {
           <p className="max-w-md text-white/85">Samjho explains numbers. Only a licensed medical doctor can diagnose conditions.</p>
           <p className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
             <Link href="/evals" className="underline underline-offset-4 hover:text-sun">
-              Test results
+              How we tested
             </Link>
             <a href="/api/health" className="underline underline-offset-4 hover:text-sun">
               System health

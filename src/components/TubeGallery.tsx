@@ -5,7 +5,7 @@
  * really produces from the lab's files. All nine tubes share ONE WebGL canvas
  * (drei <View>), so the page never runs out of browser 3D contexts.
  */
-import { Float, View } from "@react-three/drei";
+import { Float, PerspectiveCamera, View } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { motion } from "framer-motion";
 import { useRef } from "react";
@@ -60,12 +60,16 @@ export default function TubeGallery({ use3D }: { use3D: boolean }) {
               <div className={`relative h-40 w-20 shrink-0 ${c.urgent ? "urgent-pulse rounded-[2.5rem]" : ""}`}>
                 {use3D ? (
                   <View className="absolute inset-0">
+                    {/* Each tube gets its own camera framed to its own box, so it sits fully inside the card. */}
+                    <PerspectiveCamera makeDefault position={[0, 0, 7.2]} fov={30} />
                     <ambientLight intensity={1.5} />
                     <directionalLight position={[3, 4, 5]} intensity={2.2} />
                     <directionalLight position={[-4, 1, 2]} intensity={0.9} color="#fff1e6" />
                     <pointLight position={[0, -1, 2.5]} intensity={c.urgent ? 9 : 4} color={c.color} distance={8} />
-                    <Float speed={c.urgent ? 3 : 1.3} rotationIntensity={0.15} floatIntensity={0.3} floatingRange={[-0.05, 0.05]}>
+                    <Float speed={c.urgent ? 3 : 1.3} rotationIntensity={0.1} floatIntensity={0.2} floatingRange={[-0.04, 0.04]}>
+                      <group position={[0, 0.05, 0]}>
                       <Tube level={c.level} color={c.color} urgent={!!c.urgent} showMarks={c.marks} />
+                      </group>
                     </Float>
                   </View>
                 ) : (
