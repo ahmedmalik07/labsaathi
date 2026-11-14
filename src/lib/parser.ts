@@ -24,12 +24,12 @@ const MRN_KEY = /\bmrn\b|medical record|patient\s*(?:id|no|number)|record\s*(?:i
 const META_KEY =
   /\bdate\b|\bissu|\bcollect|\breported\b|\breceived\b|\bdoctor\b|\bphysician\b|\breferr|\blab(?:oratory)?\b|\bspecimen\b|\bsample\b|\bphone\b|\baddress\b|\bdob\b|\bbirth\b|\bid\b|\bpage\b|\bversion\b|\bstatus\b|\bnote\b|\bremarks?\b|\bcomment/i;
 
-const TEST_KEY = /^(?:test|tests?\s*name|test\s*(?:conducted|performed|done|ordered)|analyte(?:\s*name)?|parameter|investigation|examination|assay)$/i;
-const VALUE_KEY = /^(?:result|results|value|result\s*value|value\s*(?:recorded|observed|measured)|(?:observed|measured|recorded)\s*value|reading|finding|outcome|level)$/i;
+const TEST_KEY = /^(?:test|tests?\s*name|test\s*(?:conducted|performed|done|ordered|type)|name\s*of\s*(?:the\s*)?test|analyte(?:\s*name)?|parameter|investigation|examination|assay|marker|component)$/i;
+const VALUE_KEY = /^(?:result|results|value|result\s*value|test\s*(?:result|value)|value\s*(?:recorded|observed|measured|found|obtained)|(?:observed|measured|recorded|reported|patient)\s*(?:value|result)|reading|finding|outcome|level|measurement|observation)$/i;
 const UNIT_KEY = /^units?$|^unit of measure/i;
 
 const TABLE_TEST_COL = /test|analyte|parameter|investigation|component|name|description|assay/i;
-const TABLE_VALUE_COL = /result|value|observed|reading|finding|measure|level|outcome/i;
+const TABLE_VALUE_COL = /result|value|observ|reading|finding|measure|level|outcome|recorded/i;
 const TABLE_UNIT_COL = /unit/i;
 const TABLE_IGNORE_COL = /range|reference|ref\b|normal|flag|status|interval|method/i;
 
@@ -90,11 +90,13 @@ export function parseValueUnit(raw: string): ValueUnit | null {
   let v = raw.replace(/\s+/g, " ").trim();
   if (!v) return null;
   v = v.replace(/\s*[\[(][^\])]*[\])]\s*$/, "").trim(); // trailing "(12.1 - 15.1)" reference note
+  v = v.replace(/\s*[*↑↓!]+$/, "").trim(); // trailing marker
   v = v.replace(/\s+\(?(?:HH|LL|H|L|high|low|normal|critical|abnormal)\)?\*?$/i, "").trim(); // trailing flag
   v = v.replace(/[.;,]+$/, "").trim();
   if (!v) return null;
 
   if (config.qualitativeWords.includes(v.toLowerCase())) return { value: v, unit: null };
+  if (/^[1-4]\s?\+$/.test(v)) return { value: v, unit: null }; // dipstick grades: 1+, 2+
 
   const m = v.match(/^((?:[<>]=?\s*)?[-+]?\d[\d,]*(?:\.\d+)?)\s*(.*)$/);
   if (!m) return null;

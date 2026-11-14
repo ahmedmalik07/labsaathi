@@ -10,7 +10,7 @@ import { allowedNumbers, type EngineFacts } from "./facts";
 import { checkTexts, disclaimerFor } from "./guard";
 import { chatJSON, hashKey, llmConfigured, type ChatMessage, type LlmUsage } from "./llm/groq";
 import { templateExplanation, templateQuestions } from "./template";
-import type { Explanation } from "./types";
+import type { EngineOutput, Explanation } from "./types";
 
 type Lang = "en" | "roman-urdu";
 
@@ -140,9 +140,32 @@ export async function explain(facts: EngineFacts, lang: Lang = "en", options: { 
 }
 
 /** Flat text version for API consumers that want a single string. */
-export function explanationToText(e: Explanation): string {
-  const lines = [e.overview, ""];
+/**
+ * Flat text version for API consumers that read a single string.
+ * It is self-contained on purpose: the engine's verdict lines (status, range,
+ * "cannot be classified from the files"), the urgent warning and the questions
+ * for missing age or sex come first, word for word from the rules engine. The
+ * plain-language text and the doctor questions follow.
+ */
+export function explanationToText(e: Explanation, engine?: Pick<EngineOutput, "results" | "urgentMessage" | "needsInfo">): string {
+  const lines: string[] = [];
+  if (engine) {
+    if (engine.urgentMessage) lines.push(engine.urgentMessage, "");
+    if (engine.results.length > 0) {
+      lines.push("Results:");
+      for (const r of engine.results) lines.push(`- ${r.summary}`);
+      lines.push("");
+    }
+    for (const n of engine.needsInfo) lines.push(n.question);
+    if (engine.needsInfo.length > 0) lines.push("");
+  }
+  lines.push(e.overview, "");
   for (const t of e.tests) lines.push(`${t.test}: ${t.measures} ${t.meaning}`, "");
+  if (engine && e.doctorQuestions.length > 0) {
+    lines.push(e.lang === "roman-urdu" ? "Doctor se poochne ke sawal:" : "Questions for your doctor:");
+    e.doctorQuestions.forEach((q, i) => lines.push(`${i + 1}. ${q}`));
+    lines.push("");
+  }
   lines.push(e.disclaimer);
   return lines.join("\n").trim();
 }

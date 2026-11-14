@@ -65,7 +65,11 @@ function coreTokens(name: string, extraFillers: string[] = []): string[] {
     .map((t) => (t.length > 3 && t.endsWith("s") && !t.endsWith("ss") ? t.slice(0, -1) : t));
 }
 
-const core = (name: string, extra: string[] = []) => coreTokens(name, extra).join(" ");
+/** Word order does not matter: "Blood Sugar (Fasting)" and "Fasting Blood Sugar" share one core. */
+const core = (name: string, extra: string[] = []) => coreTokens(name, extra).sort().join(" ");
+
+/** A leading "Serum" or "Plasma" names where the sample came from, not a different test ("Serum ALT" is ALT). */
+const BLOOD_PREFIX = ["serum", "plasma"];
 
 function nameVariants(name: string): string[] {
   const variants = [name];
@@ -128,6 +132,21 @@ export function resolveName(name: string, tables: ReferenceTables, strict: boole
           if (!hits.has(target)) hits.set(target, { canonical: target, via: a.alias, source: a.source });
         }
       }
+      if (hits.size === 0) {
+        const bare = core(name, BLOOD_PREFIX);
+        if (bare && bare !== wanted) {
+          for (const c of canon) {
+            const first = normName(c).split(" ")[0];
+            if (!config.specimenWords.includes(first) && core(c) === bare) hits.set(c, { canonical: c, via: c });
+          }
+          for (const a of tables.aliases) {
+            if (core(a.alias) === bare || core(a.canonical) === bare) {
+              const target = canonByKey.get(normName(a.canonical)) ?? a.canonical;
+              if (!hits.has(target)) hits.set(target, { canonical: target, via: a.alias, source: a.source });
+            }
+          }
+        }
+      }
       if (hits.size === 1) {
         const hit = [...hits.values()][0];
         return {
@@ -136,7 +155,7 @@ export function resolveName(name: string, tables: ReferenceTables, strict: boole
           steps: [
             {
               step: "alias",
-              detail: `"${name}" is not written exactly as in the files. Matched to "${hit.canonical}" after ignoring plural endings and filler words (count, level, total). Turn on strict mode to disable this.`,
+              detail: `"${name}" is not written exactly as in the files. Matched to "${hit.canonical}" after ignoring word order, plural endings and filler words (count, level, total, serum). Turn on strict mode to disable this.`,
               source: hit.source,
             },
           ],

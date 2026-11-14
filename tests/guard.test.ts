@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { analyzeDeterministic } from "@/lib/analyze";
 import { makeReport } from "@/lib/evals";
+import { explanationToText } from "@/lib/explain";
 import { verifyExtraction } from "@/lib/extract";
 import { allowedNumbers, buildFacts } from "@/lib/facts";
 import { checkText, withDisclaimer } from "@/lib/guard";
@@ -96,6 +97,32 @@ describe("template explanation (LLM fully down)", () => {
   it("tells an urgent patient to see a doctor today", () => {
     const e = templateExplanation(factsFor("P013"), "en");
     expect(e.overview + e.tests[0].meaning).toMatch(/See a doctor today/);
+  });
+});
+
+describe("the single explanation string is self-contained", () => {
+  const text = (id: string) => {
+    const out = analyzeDeterministic({ reportText: samples.find((s) => s.id === id)!.raw });
+    return explanationToText(templateExplanation(buildFacts(out), "en"), out);
+  };
+  it("carries the engine verdicts word for word", () => {
+    expect(text("P006")).toMatch(/cannot be classified from the files/);
+    expect(text("P004")).toMatch(/See a doctor today/);
+    expect(text("P004")).toMatch(/Platelet Count: 120000 cells\/mcL is LOW/);
+    expect(text("P005")).toMatch(/6\.0 mmol\/L \(= 108 mg\/dL\) is HIGH/);
+    expect(text("P002")).toMatch(/ALT \(reported as SGPT\): 45 U\/L is NORMAL/);
+  });
+  it("asks for the missing detail instead of classifying", () => {
+    expect(text("P012")).toMatch(/biological sex \(male or female\)\?/);
+    expect(text("P012")).not.toMatch(/is (NORMAL|HIGH|LOW)\b/);
+    expect(text("P003")).toMatch(/age in years/);
+  });
+  it("always ends with the doctor line and lists doctor questions", () => {
+    for (const s of samples) {
+      const t = text(s.id);
+      expect(t).toMatch(/Only a licensed medical doctor can diagnose conditions\. This explanation is not a diagnosis\.$/);
+      expect(t).toMatch(/Questions for your doctor:\n1\. /);
+    }
   });
 });
 

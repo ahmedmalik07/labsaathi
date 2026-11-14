@@ -90,7 +90,7 @@ export async function runPipeline(input: AnalyzeInput, options: PipelineOptions 
     urgent: analysis.urgent,
     urgentMessage: analysis.urgentMessage,
     needsInfo: analysis.needsInfo,
-    explanation: explanationToText(explanation),
+    explanation: explanationToText(explanation, analysis),
     explanationDetail: explanation,
     doctorQuestions: explanation.doctorQuestions,
     trace: [...analysis.trace, ...extra],
