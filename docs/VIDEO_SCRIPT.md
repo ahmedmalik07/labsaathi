@@ -82,7 +82,9 @@ Two columns per shot: what's on screen, and what you say. Speak slowly; you can 
 | On screen | Voice |
 | :--- | :--- |
 | Upload `demo_1b_ayesha_followup.md`. Scroll to "Ayesha's history". | "Bring the next report and it shows what changed. Hemoglobin from 6.8 to 9.4, urgent to low. Kept only on your own device." |
-| Click "Tools" in the navbar, open "Check one number". | "And if you only have one number, the Tools page checks it, converts units, and shows the lab's ranges." |
+| Click "Tools" in the navbar, open "What if?" and drag the hemoglobin slider down until the card turns urgent. | "The Tools page has fourteen helpers. Drag a value and watch the rules react: low, then urgent." |
+| Open "Many reports at once", click "Run all 14 samples". | "And for a clinic: all fourteen reports in one table, urgent ones on top." |
+| Back on Diana's result, click "QR for the doctor". | "And you can hand it to your doctor as a QR code, or save it as an image for the family group." |
 
 ### 10 · Close (2:45 to 3:00)
 

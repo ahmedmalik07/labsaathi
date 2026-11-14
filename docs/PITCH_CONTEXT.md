@@ -76,6 +76,13 @@ Eight steps. Say them as a pipeline.
 | **Asks instead of guessing** | Missing age or sex shows a small form. It never reads sex from a name (sample P002 is "Bob Jones", Female, on purpose). |
 | **Ask by voice, in Urdu** | Tap the mic and ask "mera sugar zyada hai kya?". Groq's free Whisper turns it into English text, so it passes the same privacy lock and guard as typing. The answer comes back in Roman Urdu and is read aloud. None of the competitors we found do this. |
 | **Share from WhatsApp** | Add Samjho to the home screen on Android and it appears in the share menu. Share the report WhatsApp sent you and it opens already loaded. (Android only; iPhone users upload the photo.) |
+| **What if? slider** | Drag a value across the lab's limits and watch the label, the tube and the red banner change live. Shows the rules are real, not a lookup of the samples. |
+| **Compare two reports** | Before and after, with arrows and status changes. Refuses to compare two different people. |
+| **Report X-ray** | Shows exactly what Samjho read from a messy report: the noise it cut, the details found, each test with its layout and line. |
+| **Many reports at once** | For clinics: drop in many reports, get one table with urgent ones on top, download as CSV. |
+| **Take it with you** | Under every result: a summary image to share on WhatsApp, a QR code the doctor scans off your screen, a retest reminder for the calendar. |
+| **Urgent help** | An urgent result also shows "Call 1122" and "Hospitals near me", not just a warning. |
+| **Easy-read mode** | One "Aa" tap makes text bigger and darker, for parents and grandparents. |
 | **Photo of a report** | Upload a picture. The text is read on the device (Tesseract OCR), shown for the user to check, then goes through the same rules. The image is never uploaded. |
 | **Profiles ("Your people")** | Each report is filed under the person it belongs to. If the report has no name, Samjho asks whose it is. One family, many profiles, all stored on the device. |
 | **Scroll story** | The site opens with a pinned, scroll-driven scene: the slip gets question marks, gets buried in scary search results, is scanned line by line, then becomes a 3D rack of filling tubes. |

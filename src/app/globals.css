@@ -154,3 +154,16 @@ body {
     margin: 16mm;
   }
 }
+
+/* ---- easy-read mode: bigger text, stronger contrast (header "Aa" button) ---- */
+html.easy-read {
+  font-size: 118%;
+}
+html.easy-read .text-muted {
+  color: #3d3732;
+}
+html.easy-read .text-ink\/75,
+html.easy-read .text-ink\/80,
+html.easy-read .text-ink\/85 {
+  color: #16130f;
+}

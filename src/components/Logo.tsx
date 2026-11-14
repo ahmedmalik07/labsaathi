@@ -13,7 +13,7 @@ export default function Logo() {
   return (
     <span className="flex items-center gap-2">
       <LogoMark />
-      <span className="font-display text-[1.45rem] leading-none sm:text-[1.7rem] font-semibold tracking-tight text-ink">Samjho</span>
+      <span className="font-display hidden text-[1.45rem] leading-none font-semibold tracking-tight text-ink min-[420px]:inline sm:text-[1.7rem]">Samjho</span>
     </span>
   );
 }

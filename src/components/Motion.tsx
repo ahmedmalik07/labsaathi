@@ -34,18 +34,22 @@ export function Tilt({ children, className = "", max = 5 }: { children: React.Re
   );
 }
 
-/** Counts up to a number the first time it is shown. Text values are shown as they are. */
+/**
+ * Counts up to a number the first time it is shown. After that it simply shows
+ * the current value, so a value that changes later (the "what if" slider) is
+ * never stale. Text values are shown as they are.
+ */
 export function CountUp({ value, className = "" }: { value: string; className?: string }) {
   const reduce = useReducedMotion();
   const target = Number(value.replace(/,/g, ""));
   const decimals = (value.split(".")[1] ?? "").length;
   const useCommas = value.includes(",");
-  const [shown, setShown] = useState(value);
-  const done = useRef(false);
+  const [shown, setShown] = useState<string | null>(null);
+  const started = useRef(false);
 
   useEffect(() => {
-    if (reduce || done.current || !Number.isFinite(target)) return;
-    done.current = true;
+    if (reduce || started.current || !Number.isFinite(target)) return;
+    started.current = true;
     const controls = animate(0, target, {
       duration: 0.9,
       ease: [0.22, 1, 0.36, 1],
@@ -53,10 +57,13 @@ export function CountUp({ value, className = "" }: { value: string; className?: 
         const fixed = v.toFixed(decimals);
         setShown(useCommas ? Number(fixed).toLocaleString("en-US", { minimumFractionDigits: decimals }) : fixed);
       },
-      onComplete: () => setShown(value),
+      onComplete: () => setShown(null),
     });
-    return () => controls.stop();
-  }, [reduce, target, decimals, useCommas, value]);
+    return () => {
+      controls.stop();
+      setShown(null);
+    };
+  }, [reduce, target, decimals, useCommas]);
 
-  return <span className={className}>{shown}</span>;
+  return <span className={className}>{shown ?? value}</span>;
 }

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { AnalyzeResponse } from "@/lib/pipeline";
 import type { Explanation } from "@/lib/types";
 import Closing from "./Closing";
+import EasyRead from "./EasyRead";
 import ExplainTabs, { type Lang } from "./ExplainTabs";
 import Hero, { type SampleInfo } from "./Hero";
 import History, { Profiles } from "./History";
@@ -14,6 +15,7 @@ import NeedsInfoForm from "./NeedsInfoForm";
 import ResultCard from "./ResultCard";
 import { STEP_LABEL } from "./status";
 import ScrollStory from "./ScrollStory";
+import TakeAway, { UrgentHelp } from "./TakeAway";
 import { useSharedReport } from "./useSharedReport";
 import Toolbox from "./Toolbox";
 import { useThreeD } from "./useThreeD";
@@ -159,6 +161,7 @@ export default function SamjhoApp({ mode = "full" }: { mode?: "full" | "test" })
             <Logo />
           </Link>
           <nav className="flex items-center gap-1.5 text-sm font-semibold sm:gap-2">
+            <EasyRead />
             <div className="flex rounded-full bg-white p-1" role="group" aria-label="Explanation language">
               {(
                 [
@@ -231,6 +234,7 @@ export default function SamjhoApp({ mode = "full" }: { mode?: "full" | "test" })
                     <div>
                       <p className="font-display text-4xl leading-none font-semibold sm:text-5xl">See a doctor today</p>
                       <p className="mt-2 text-lg leading-relaxed text-white/90">{data.urgentMessage?.replace(/^URGENT:\s*/, "")}</p>
+                      <UrgentHelp />
                     </div>
                   </motion.div>
                 )}
@@ -304,6 +308,8 @@ export default function SamjhoApp({ mode = "full" }: { mode?: "full" | "test" })
                     ))}
                   </div>
                 )}
+
+                {data.results.length > 0 && <TakeAway data={data} />}
 
                 {data.results.length > 0 && <History patient={data.patient} results={data.results} reportText={text} complete={data.needsInfo.every((n) => n.blocking.length === 0)} />}
 

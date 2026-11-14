@@ -10,18 +10,26 @@ import type { AnalyzeResponse } from "@/lib/pipeline";
 import type { ReferenceTables } from "@/lib/types";
 import { Tilt } from "./Motion";
 import ResultCard from "./ResultCard";
+import { ApiPlayground, Batch, Compare, InstallButton, ReminderMaker, UrduWords, WhatIf, XRay } from "./MoreTools";
 import TestIcon from "./TestIcon";
 
-type ToolId = "check" | "convert" | "ranges" | "urgent" | "shortforms" | "guide" | "visit";
+type ToolId = "check" | "whatif" | "compare" | "xray" | "batch" | "convert" | "ranges" | "urgent" | "shortforms" | "guide" | "urdu" | "visit" | "reminder" | "api";
 
 const TOOLS: Array<{ id: ToolId; title: string; blurb: string; emoji: string }> = [
   { id: "check", title: "Check one number", blurb: "Only have one value? Type it in.", emoji: "🔎" },
+  { id: "whatif", title: "What if?", blurb: "Drag a value, watch the verdict change.", emoji: "🎚️" },
+  { id: "compare", title: "Compare two reports", blurb: "What changed between visits?", emoji: "⚖️" },
+  { id: "xray", title: "Report X-ray", blurb: "See exactly what Samjho read.", emoji: "🩻" },
+  { id: "batch", title: "Many reports at once", blurb: "For clinics: one table, urgent first.", emoji: "🗂️" },
   { id: "convert", title: "Unit converter", blurb: "mmol/L or mg/dL? g/L or g/dL?", emoji: "🔁" },
   { id: "ranges", title: "The lab's normal ranges", blurb: "Every range in the lab's sheets.", emoji: "📏" },
   { id: "urgent", title: "Danger limits", blurb: "When to see a doctor today.", emoji: "🚨" },
   { id: "shortforms", title: "What does SGPT mean?", blurb: "Short forms on your report, decoded.", emoji: "🔤" },
   { id: "guide", title: "What each test is for", blurb: "In plain words, one line each.", emoji: "📘" },
+  { id: "urdu", title: "Urdu words", blurb: "Report words in everyday Urdu.", emoji: "🗣️" },
   { id: "visit", title: "Doctor visit checklist", blurb: "What to bring and what to ask.", emoji: "🩺" },
+  { id: "reminder", title: "Retest reminder", blurb: "Put the next test in your calendar.", emoji: "📅" },
+  { id: "api", title: "For developers", blurb: "Try the API live.", emoji: "🧪" },
 ];
 
 const GUIDE: Array<{ test: string; what: string }> = [
@@ -369,7 +377,11 @@ export default function Toolbox({ use3D }: { use3D: boolean }) {
     <section id="tools" className="scroll-mt-16 border-t border-ink/10" aria-label="More tools">
       <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-8">
         <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">More tools</p>
-        <h2 className="font-display mt-1 text-5xl leading-none font-semibold text-ink">Not a full report? Start here.</h2>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h2 className="font-display mt-1 text-5xl leading-none font-semibold text-ink">Not a full report? Start here.</h2>
+          <InstallButton />
+        </div>
+        <p className="mt-2 text-muted">{TOOLS.length} tools. Every verdict comes from the same rules and the same lab sheets as the main app.</p>
 
         <div className="thin-scroll mt-6 -mx-5 flex gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0 lg:grid-cols-7">
           {TOOLS.map((t) => (
@@ -394,7 +406,7 @@ export default function Toolbox({ use3D }: { use3D: boolean }) {
           <AnimatePresence mode="wait">
             <motion.div key={tool} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.22 }}>
               <h3 className="font-display mb-5 text-3xl font-semibold text-ink">{current.title}</h3>
-              {!tables && tool !== "convert" && tool !== "guide" && tool !== "visit" ? (
+              {!tables && ["check", "whatif", "ranges", "urgent", "shortforms"].includes(tool) ? (
                 <div className="grid gap-2" aria-hidden="true">
                   {Array.from({ length: 4 }, (_, i) => (
                     <div key={i} className="skeleton h-10 rounded-xl" />
@@ -409,6 +421,13 @@ export default function Toolbox({ use3D }: { use3D: boolean }) {
                   {tool === "shortforms" && tables && <ShortForms tables={tables} />}
                   {tool === "guide" && <Guide />}
                   {tool === "visit" && <Visit />}
+                  {tool === "whatif" && tables && <WhatIf tables={tables} use3D={use3D} />}
+                  {tool === "compare" && <Compare />}
+                  {tool === "xray" && <XRay />}
+                  {tool === "batch" && <Batch />}
+                  {tool === "urdu" && <UrduWords />}
+                  {tool === "reminder" && <ReminderMaker />}
+                  {tool === "api" && <ApiPlayground />}
                 </>
               )}
             </motion.div>
