@@ -87,6 +87,24 @@ Eight steps. Say them as a pipeline.
 
 ---
 
+## 4b. What others do, and where Samjho is different
+
+Researched on 2026-11-14. Most sources are the vendors' own pages, so treat their claims as claims.
+
+| Who | What they offer | What they do not show |
+| :--- | :--- | :--- |
+| **Wizey** (iOS app) | Photo or PDF upload, plain-English explanation, "personalised recommendations", follow-up chat, claims 500+ tests. | Which reference range was used, or where it came from. A broad "recommendations" promise is exactly where a model can overstep. |
+| **Docus AI** | Upload PDFs or images, recommendations, trend tracking; a white-label version for labs. | Same: no per-result citation of the lab's own ranges. |
+| **Quest Diagnostics + Google** (US) | A chatbot inside the MyQuest app that defines test names and terms from your report. | Built for one US lab. No Urdu. |
+| **TestResult.ai, Blood Insight AI, Plainvue.AI** | Plain-language translations of lab markers. | Same pattern: the model explains and judges. |
+| **Chughtai Lab, Shaukat Khanum** (Pakistan) | Apps and WhatsApp delivery of the report itself. | Nothing explains the report, in English or Urdu. |
+
+**The pitch line:** "Every app we found lets the AI read your numbers and decide. We found none that shows you which lab sheet and which line its answer came from, and none in Roman Urdu. Samjho does both, and refuses when the lab's files don't cover a test."
+
+**Gaps nobody fills that Samjho already covers:** per-result file and line citation; asks for missing age or sex instead of guessing; says "cannot be classified" instead of inventing a range; Roman Urdu; works with the AI switched off; the patient's data stays on the device.
+
+---
+
 ## 5. Proof (slide 6)
 
 - **267 automated tests, all green.** Includes every boundary of every range row, generated from the lab's files.
