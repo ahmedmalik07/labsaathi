@@ -144,6 +144,7 @@ Only `reportText` is required. `age` and `sex` fill gaps when the report does no
 | `GET /api/health` | Model status, fallback model, retry and cache counters, knowledge-base counts. |
 | `GET /api/samples`, `GET /api/samples/P001` | The 14 sample reports for the quick picks. |
 | `GET /api/evals` | Runs the acceptance cases live against the deployed engine. |
+| `POST /api/transcribe` | Multipart `audio` field, up to 8 MB. Returns `{ text }` in English. Used by the voice button. |
 
 ---
 
@@ -349,6 +350,8 @@ tests/                  Vitest suites
 - The page opens with a scroll-driven story (one pinned scene, a report slip that is scanned and labelled as you scroll, then a 3D rack of tubes that fill). A "Skip to my report" button and a header button jump straight to the tool. Old wording kept for reference: the report as it arrives, the confusion, the 2 a.m. search, and the same report read against the lab's sheets.
 - Roman Urdu toggle, read-aloud (browser Web Speech API), and a printable "Questions for my doctor" sheet.
 - Profiles: every explained report is filed under the person it belongs to (MRN or name from the report, or a name the user types when the report has neither). "Your people" lists the profiles with their report timeline. All of it lives in the browser's local storage only.
+- Voice questions: in the follow-up chat, tap the mic and ask out loud in Urdu, Punjabi or English. The recording goes to Groq's free `whisper-large-v3` through `POST /api/transcribe`, using the *translations* endpoint so the text comes back in English. That is on purpose: the privacy lock and the guard check Latin-script text, so a spoken question passes exactly the same checks as a typed one. The answer is written in the language the patient picked and read back aloud. Very short transcripts (Whisper invents "you" for silence) are rejected.
+- Share from WhatsApp: the app is installable (web manifest with a `share_target`). On Android, once added to the home screen, Samjho appears in the share sheet. A report photo or text file shared from WhatsApp is caught by a small service worker (`public/sw.js`), parked in a private cache on the phone, and opened in the report box; the parked copy is deleted as soon as it is read. Nothing is uploaded at that step. iPhones do not support web share targets, so there the user saves the photo and uses Upload.
 - Photo upload: a picture of a report is read on the device with Tesseract OCR, shown as editable text, then goes through the same rules engine.
 - Each result card has a range bar: the green band is the lab's normal range and the dot is the patient's value.
 - Personal history: when the same patient (same MRN) brings a newer report, a panel shows what changed since the last one, for example "Hemoglobin 6.8 → 9.4, Urgent → Low". It is stored only in the browser's local storage, is never sent to the server or the model, and has a "forget" button. It does not weaken the one-report privacy lock: the chat still only knows the report that is open.

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface SampleInfo {
   id: string;
@@ -19,6 +19,8 @@ interface HeroProps {
   onText: (text: string, fileName: string | null) => void;
   onPick: (sample: SampleInfo) => void;
   onAnalyze: () => void;
+  /** A file shared into Samjho from another app (WhatsApp, Gallery). */
+  incomingFile?: File | null;
 }
 
 export const DEMO_FILES = [
@@ -28,7 +30,7 @@ export const DEMO_FILES = [
   { file: "demo_3_sana_messy_layout.md", label: "Sana: messy layout, unknown test" },
 ];
 
-export default function Hero({ samples, text, fileName, busy, error, onText, onPick, onAnalyze }: HeroProps) {
+export default function Hero({ samples, text, fileName, busy, error, onText, onPick, onAnalyze, incomingFile }: HeroProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -77,6 +79,13 @@ export default function Hero({ samples, text, fileName, busy, error, onText, onP
     }
     onText(await file.text(), file.name);
   }
+
+  // A report shared from another app goes through the same path as an upload.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading the shared file updates the upload state
+    if (incomingFile) void readFile(incomingFile);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incomingFile]);
 
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
 

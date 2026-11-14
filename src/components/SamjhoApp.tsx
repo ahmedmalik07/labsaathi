@@ -13,6 +13,7 @@ import NeedsInfoForm from "./NeedsInfoForm";
 import ResultCard from "./ResultCard";
 import { STEP_LABEL } from "./status";
 import ScrollStory from "./ScrollStory";
+import { useSharedReport } from "./useSharedReport";
 import { useThreeD } from "./useThreeD";
 
 /** WebGL contexts are limited per page, so only the first cards get a 3D tube. */
@@ -32,6 +33,8 @@ export default function SamjhoApp() {
   const [explanationBusy, setExplanationBusy] = useState(false);
   const [showTrace, setShowTrace] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const shared = useSharedReport();
+  const [incomingFile, setIncomingFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetch("/api/samples")
@@ -109,6 +112,23 @@ export default function SamjhoApp() {
     [data, explanations],
   );
 
+  // A report shared in from WhatsApp or another app.
+  useEffect(() => {
+    if (!shared) return;
+    document.getElementById("top")?.scrollIntoView();
+    if (shared.kind === "note") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reacting to a one-off share
+      setError(shared.message);
+    } else if (shared.kind === "file") {
+      setIncomingFile(shared.file);
+    } else {
+      setText(shared.text);
+      setFileName(shared.name);
+      void analyze(shared.text, shared.name, {}, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shared]);
+
   const explanation = data ? (explanations[lang] ?? data.explanationDetail) : null;
   const counts = data
     ? {
@@ -180,6 +200,7 @@ export default function SamjhoApp() {
           }}
           onPick={pick}
           onAnalyze={() => analyze(text, fileName, {}, true)}
+          incomingFile={incomingFile}
         />
 
         <div ref={resultsRef} className="scroll-mt-20">

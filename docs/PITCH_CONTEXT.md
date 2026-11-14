@@ -74,6 +74,8 @@ Eight steps. Say them as a pipeline.
 | **"How we got this" on every card** | Shows the alias match, the unit conversion, the range and the exact file and line. The user and the judge can check the work. |
 | **3D test tubes** | The liquid level shows where your value sits in the range. Two rings mark the low and high limits. Colour is the status. Urgent tubes pulse. |
 | **Asks instead of guessing** | Missing age or sex shows a small form. It never reads sex from a name (sample P002 is "Bob Jones", Female, on purpose). |
+| **Ask by voice, in Urdu** | Tap the mic and ask "mera sugar zyada hai kya?". Groq's free Whisper turns it into English text, so it passes the same privacy lock and guard as typing. The answer comes back in Roman Urdu and is read aloud. None of the competitors we found do this. |
+| **Share from WhatsApp** | Add Samjho to the home screen on Android and it appears in the share menu. Share the report WhatsApp sent you and it opens already loaded. (Android only; iPhone users upload the photo.) |
 | **Photo of a report** | Upload a picture. The text is read on the device (Tesseract OCR), shown for the user to check, then goes through the same rules. The image is never uploaded. |
 | **Profiles ("Your people")** | Each report is filed under the person it belongs to. If the report has no name, Samjho asks whose it is. One family, many profiles, all stored on the device. |
 | **Scroll story** | The site opens with a pinned, scroll-driven scene: the slip gets question marks, gets buried in scary search results, is scanned line by line, then becomes a 3D rack of filling tubes. |
@@ -158,7 +160,7 @@ Open https://techfusion.wyibe.com. Have the four demo files downloaded (links ar
 
 **2:25 History.** Upload `demo_1b_ayesha_followup.md`. "Six weeks later. Hemoglobin 6.8 to 9.4, urgent to low. Platelets back to normal. Kept only on this device."
 
-**2:40 Local touch.** Tap Roman Urdu, then Read aloud for two seconds. Show "Print this sheet" and the WhatsApp button.
+**2:40 Local touch.** Tap Roman Urdu. In "Ask a follow-up", tap the mic and say "Mera sugar kitna zyada hai?". Let the answer play for a few seconds. Mention you can share a report straight from WhatsApp on Android. Show "Print this sheet".
 
 **2:50 Close.** Open `/evals`: "60 of 60, running live right now. Rules decide, AI explains, and we check the AI."
 

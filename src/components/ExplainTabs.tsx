@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ChatReply } from "@/lib/chat";
 import type { Explanation, Patient, TestResult } from "@/lib/types";
 import PrintSheet from "./PrintSheet";
+import { useRecorder } from "./useRecorder";
 import { useSpeech } from "./useSpeech";
 
 export type Lang = "en" | "roman-urdu";
@@ -57,6 +58,9 @@ function SourceBadge({ explanation }: { explanation: Explanation }) {
 
 export default function ExplainTabs({ explanation, explanationBusy, patient, results, sessionId, lang, urgentMessage }: Props) {
   const speech = useSpeech();
+  const mic = useRecorder(30);
+  const [listening, setListening] = useState(false);
+  const [voiceNote, setVoiceNote] = useState<string | null>(null);
   const [tab, setTab] = useState<TabId>("explain");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -79,7 +83,7 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
   }, [messages, sending]);
 
-  async function send(text: string) {
+  async function send(text: string, spoken = false) {
     const message = text.trim();
     if (!message || sending) return;
     const history = messages.filter((m) => !m.refused).map((m) => ({ role: m.role, content: m.content }));
@@ -96,10 +100,38 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
       if (!res.ok) throw new Error(json.error?.message ?? "The follow-up could not be answered.");
       const reply = json as ChatReply;
       setMessages((m) => [...m, { role: "assistant", content: reply.reply, refused: reply.refused, source: reply.source, citation: reply.citation }]);
+      // Asked by voice, answered by voice.
+      if (spoken) speech.speak(reply.reply, lang);
     } catch (e) {
       setMessages((m) => [...m, { role: "assistant", content: e instanceof Error ? e.message : "Something went wrong. Please try again.", source: "template" }]);
     } finally {
       setSending(false);
+    }
+  }
+
+  async function toggleMic() {
+    setVoiceNote(null);
+    if (!mic.recording) {
+      speech.stop();
+      const problem = await mic.start();
+      if (problem) setVoiceNote(problem);
+      return;
+    }
+    const audio = await mic.stop();
+    if (!audio) return;
+    setListening(true);
+    try {
+      const form = new FormData();
+      form.append("audio", audio, `question.${audio.type.includes("mp4") ? "m4a" : audio.type.includes("ogg") ? "ogg" : "webm"}`);
+      const res = await fetch("/api/transcribe", { method: "POST", body: form });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error?.message ?? "I could not understand the recording.");
+      setVoiceNote(`Heard: "${json.text}"`);
+      await send(json.text, true);
+    } catch (e) {
+      setVoiceNote(e instanceof Error ? e.message : "I could not understand the recording.");
+    } finally {
+      setListening(false);
     }
   }
 
@@ -284,10 +316,45 @@ export default function ExplainTabs({ explanation, explanationBusy, patient, res
                   placeholder={lang === "roman-urdu" ? "Apna sawal likhein..." : "Type your question..."}
                   className="min-w-0 flex-1 rounded-2xl border border-ink/15 bg-cream-deep/60 px-4 py-3 text-base text-ink placeholder:text-muted focus:border-brand focus:outline-none"
                 />
+                {mic.supported && (
+                  <button
+                    type="button"
+                    onClick={toggleMic}
+                    disabled={sending || listening}
+                    aria-pressed={mic.recording}
+                    aria-label={mic.recording ? "Stop recording and send" : "Ask by voice, in Urdu or English"}
+                    title="Ask by voice, in Urdu or English"
+                    className={`relative flex h-[3.15rem] w-[3.15rem] shrink-0 items-center justify-center rounded-2xl border transition disabled:opacity-50 ${mic.recording ? "border-urgent bg-urgent text-white" : "border-ink/25 bg-white text-ink hover:border-brand hover:text-brand"}`}
+                  >
+                    {mic.recording && <span className="absolute inset-0 animate-ping rounded-2xl bg-urgent/40" aria-hidden="true" />}
+                    {listening ? (
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-ink/30 border-t-ink" aria-hidden="true" />
+                    ) : mic.recording ? (
+                      <span className="relative h-3.5 w-3.5 rounded-sm bg-white" aria-hidden="true" />
+                    ) : (
+                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <rect x="9" y="3" width="6" height="11" rx="3" />
+                        <path d="M5.500 11a6.500 6.500 0 0013 0M12 17.500V21" strokeLinecap="round" />
+                      </svg>
+                    )}
+                  </button>
+                )}
                 <button type="submit" disabled={sending || !draft.trim()} className="rounded-2xl bg-brand px-5 py-3 font-semibold text-white transition hover:bg-brand-dark disabled:opacity-50">
                   Send
                 </button>
               </form>
+              {(mic.recording || listening || voiceNote) && (
+                <p className="mt-2 text-sm text-muted" role="status">
+                  {mic.recording
+                    ? `Listening... ${mic.seconds}s. Ask in Urdu or English, then tap the button again.`
+                    : listening
+                      ? "Turning your voice into text..."
+                      : voiceNote}
+                </p>
+              )}
+              {!mic.recording && !listening && !voiceNote && mic.supported && (
+                <p className="mt-2 text-sm text-muted">Tap the mic and ask out loud, in Urdu or English. The answer is read back to you.</p>
+              )}
             </div>
           )}
         </motion.div>
