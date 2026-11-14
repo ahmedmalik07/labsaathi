@@ -7,6 +7,7 @@ import type { AnalyzeResponse } from "@/lib/pipeline";
 import type { Explanation } from "@/lib/types";
 import ExplainTabs, { type Lang } from "./ExplainTabs";
 import Hero, { type SampleInfo } from "./Hero";
+import History from "./History";
 import Logo from "./Logo";
 import NeedsInfoForm from "./NeedsInfoForm";
 import ResultCard from "./ResultCard";
@@ -217,6 +218,28 @@ export default function SamjhoApp() {
                       {data.results.length} {data.results.length === 1 ? "result" : "results"}: {summaryLine}.
                     </p>
                   )}
+                  {data.results.length > 0 && (
+                    <p className="mt-3">
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(
+                          [
+                            `Lab report summary${data.patient.name ? ` for ${data.patient.name.split(" ")[0]}` : ""} (from Samjho):`,
+                            ...(data.urgent ? ["URGENT: see a doctor today."] : []),
+                            ...data.results.map((r) => `- ${r.canonicalName}: ${r.rawValue}${r.unit ? " " + r.unit : ""} = ${r.status === "unclassified" ? "cannot be classified" : r.status.replace("_", " ")}`),
+                            "Only a licensed doctor can diagnose.",
+                          ].join("\n"),
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full border border-ink/25 bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:border-forest hover:text-forest"
+                      >
+                        <svg viewBox="0 0 24 24" className="h-4 w-4 text-forest" fill="currentColor" aria-hidden="true">
+                          <path d="M12 2a10 10 0 00-8.600 15.100L2 22l5-1.300A10 10 0 1012 2zm0 18a8 8 0 01-4.100-1.100l-.300-.200-2.900.800.800-2.800-.200-.300A8 8 0 1112 20zm4.400-5.700c-.200-.100-1.400-.700-1.600-.800s-.400-.100-.500.100-.600.800-.700.900-.300.200-.500.100a6.500 6.500 0 01-3.200-2.800c-.200-.400.200-.400.600-1.200.100-.100 0-.300 0-.400l-.700-1.700c-.200-.400-.400-.400-.500-.400h-.500a.900.900 0 00-.600.300 2.700 2.700 0 00-.800 2c0 1.200.800 2.300 1 2.500s1.700 2.600 4.100 3.600c1.500.600 2.100.700 2.900.600.500-.100 1.400-.600 1.600-1.100s.200-1 .100-1.100-.200-.200-.400-.300z" />
+                        </svg>
+                        Send summary to family on WhatsApp
+                      </a>
+                    </p>
+                  )}
                 </div>
 
                 {data.needsInfo.length > 0 && (
@@ -246,6 +269,8 @@ export default function SamjhoApp() {
                     ))}
                   </div>
                 )}
+
+                {data.results.length > 0 && <History patient={data.patient} results={data.results} reportText={text} complete={data.needsInfo.every((n) => n.blocking.length === 0)} />}
 
                 {data.results.length > 0 && (
                   <ExplainTabs

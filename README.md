@@ -348,14 +348,17 @@ tests/                  Vitest suites
 - Look: warm paper background, ink text, one orange accent, a serif display face (Cormorant Garamond) with Figtree for text. Status colours: green normal, amber low or high, red urgent, grey cannot classify, blue needs info.
 - The page tells a short story below the tool: the report as it arrives, the confusion, the 2 a.m. search, and the same report read against the lab's sheets.
 - Roman Urdu toggle, read-aloud (browser Web Speech API), and a printable "Questions for my doctor" sheet.
+- Personal history: when the same patient (same MRN) brings a newer report, a panel shows what changed since the last one, for example "Hemoglobin 6.8 → 9.4, Urgent → Low". It is stored only in the browser's local storage, is never sent to the server or the model, and has a "forget" button. It does not weaken the one-report privacy lock: the chat still only knows the report that is open.
+- A WhatsApp button sends a short summary to family. The user chooses to share; nothing is sent automatically.
 
 ## 12. Demo reports
 
-Three extra reports for a live demo are in `public/demo/` and can be downloaded from the home page. They are new patients, not part of the corpus, and the engine has no special knowledge of them.
+Extra reports for a live demo are in `public/demo/` and can be downloaded from the home page. They are new patients, not part of the corpus, and the engine has no special knowledge of them.
 
 | File | What it shows |
 | :--- | :--- |
 | `demo_1_ayesha_full_checkup.md` | All seven kinds of test in one table. Hb 6.8 is urgent, PLT 148000 is low, SGPT 45 and Cholesterol 200 sit exactly on the limit and are normal, FBS 5.2 mmol/L converts to 93.6 mg/dL, TSH 4.6 is high. |
+| `demo_1b_ayesha_followup.md` | The same patient six weeks later. Load it after demo 1 to see the history panel. |
 | `demo_2_bilal_missing_details.md` | Age and sex are missing, so nothing is labelled and the app asks. Answer "male, 40" and SGOT 44 is normal; answer "female" and it is high. |
 | `demo_3_sana_messy_layout.md` | No markdown, mixed separators, "Age/Sex: 52/F". FBS 17 mmol/L becomes 306 mg/dL and is urgent. Ferritin, RBC and Cholesterol in mmol/L come back "cannot be classified". Urine Protein "Trace" is abnormal. |
 

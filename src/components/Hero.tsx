@@ -28,6 +28,7 @@ interface HeroProps {
 
 export const DEMO_FILES = [
   { file: "demo_1_ayesha_full_checkup.md", label: "Ayesha: full check-up, one urgent result" },
+  { file: "demo_1b_ayesha_followup.md", label: "Ayesha again: six weeks later, shows her history" },
   { file: "demo_2_bilal_missing_details.md", label: "Bilal: age and sex missing" },
   { file: "demo_3_sana_messy_layout.md", label: "Sana: messy layout, unknown test" },
 ];
